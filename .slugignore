@@ -1,0 +1,5 @@
+# Heroku deploy ignore files
+# https://devcenter.heroku.com/articles/slug-compiler#ignoring-files-with-slugignore
+
+# typescript source files
+/src
