@@ -3,8 +3,8 @@ const axios = require('axios').default
 const PAGE_ACCESS_TOKEN = process.env.PAGE_ACCESS_TOKEN
 const FB_GRAPH_API = 'https://graph.facebook.com/v11.0/me/messages'
 
-module.exports = {
-  async sendAPI(sender_psid, msg) {
+const apis = {
+  async sendAPI(sender_psid: string, msg: string) {
     try {
       await axios.post(FB_GRAPH_API, {
         recipient: { id: sender_psid },
@@ -19,3 +19,5 @@ module.exports = {
     }
   }
 }
+
+export default apis
