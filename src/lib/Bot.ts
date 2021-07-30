@@ -39,29 +39,29 @@ class Bot extends Events {
 
   initWebhook() {
     // Verify webhook callback URL
-    this.app.get('/webhook', this.verifyWebhook)
+    this.app.get('/webhook', (req, res) => {
+      const {
+        'hub.mode': mode,
+        'hub.verify_token': token,
+        'hub.challenge': challenge,
+      } = req.query
+
+      if (mode !== 'subscribe' || token !== this.verifyToken) {
+        console.log('Failed validation. Make sure the validation tokens match')
+        return res.sendStatus(403)
+      }
+
+      res.status(200).send(challenge)
+      console.log('Validation Succeeded')
+    })
+
     // Receive messaging
-    this.app.post('/webhook', (req, res) => this.postWebhook(req, res))
-  }
-
-  verifyWebhook(req: Request, res: Response) {
-    const {
-      'hub.mode': mode,
-      'hub.verify_token': token,
-      'hub.challenge': challenge,
-    } = req.query
-
-    if (mode !== 'subscribe' || token !== this.verifyToken) {
-      console.log('Failed validation. Make sure the validation tokens match')
-      return res.sendStatus(403)
-    }
-
-    res.status(200).send(challenge)
-    console.log('Validation Succeeded')
+    this.app.post('/webhook', (req, res) => {
+      this.postWebhook(req, res)
+    })
   }
 
   postWebhook(req: Request, res: Response) {
-    console.log('postWebhook')
     const body: msgerBody = req.body
     if (body.object === 'instagram') {
       this.handleMsgerData(body)
@@ -72,16 +72,21 @@ class Bot extends Events {
   }
 
   handleMsgerData(body: msgerBody) {
-    console.log('\nbody', body)
     // Iterate over each entry. There may be multiple if batched.
     body.entry.forEach((entry) => {
-      console.log('messaging', entry.messaging)
       // Iterate over each messaging event
       entry.messaging.forEach((event) => {
         if (event.message?.is_echo) return void 0
 
+        console.log('\nbody', body)
+        console.log('messaging', entry.messaging)
+
         if (event.message?.text) {
-          this.emit('text', event)
+          if (event.message?.quick_reply) {
+            this.emit('quickReply', event)
+          } else {
+            this.emit('text', event)
+          }
         }
       })
     })
