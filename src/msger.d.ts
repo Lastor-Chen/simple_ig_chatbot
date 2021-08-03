@@ -86,3 +86,83 @@ interface QuickReply {
   payload: string
   image_url?: string
 }
+
+/**
+ * IG Generic Template
+ * @see {@link SendAPI}
+ */
+interface TemplateMsg extends SendAPI {
+  message: {
+    attachment: {
+      type: 'template'
+      payload: {
+        template_type: 'generic'
+        /** 最大 10 個, 除了 title 之外, 至少需再設置一個屬性 */
+        elements: TemplateElement[]
+      }
+    }
+  }
+}
+
+interface TemplateElement {
+  /** 80 character limit */
+  title: string
+  /** 80 character limit */
+  subtitle?: string
+  image_url?: string
+  /** The default action executed when the template is tapped */
+  default_action?: {
+    type: 'web_url'
+    url: string
+  }
+  /** A maximum of 3 buttons per element is supported */
+  buttons?: ButtonType[]
+}
+
+type ButtonType =
+  | URLButton
+  | PostbackButton
+  | CallButton
+  | LoginButton
+  | LoginButton
+  | GamePlayButton
+
+interface URLButton {
+  type: 'web_url'
+  title: string
+  url: string
+}
+
+interface PostbackButton {
+  type: 'postback'
+  title: string
+  payload: string
+}
+
+interface CallButton {
+  type: 'phone_number'
+  title: string
+  /** phone number */
+  payload: string
+}
+
+interface LoginButton {
+  type: 'account_link'
+  url: string
+}
+
+interface LoginButton {
+  type: 'account_unlink'
+}
+
+interface GamePlayButton {
+  type: 'game_play'
+  title: string
+  /**  This data will be sent to the game */
+  payload: string
+  /** Only one of the below */
+  game_metadata: {
+    player_id: string
+    context_id: string
+  }
+}

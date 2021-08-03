@@ -35,11 +35,11 @@ bot.on('text', (event: MsgerEvent) => {
     // msgerAPI.sendText(senderId, `Auto reply: ${senderMsg}`)
 
     // 圖片
-    msgerAPI.sendAttachment(
-      senderId,
-      'image',
-      'https://i.gyazo.com/5f23b5bfdf8f11078275bc0a954471c2.png'
-    )
+    // msgerAPI.sendAttachment(
+    //   senderId,
+    //   'image',
+    //   'https://i.gyazo.com/5f23b5bfdf8f11078275bc0a954471c2.png'
+    // )
 
     // quick reply text
     // msgerAPI.sendText(senderId, '快速回覆', [
@@ -47,6 +47,26 @@ bot.on('text', (event: MsgerEvent) => {
     //   { title: '按鈕B', payload: 'testB' },
     //   { title: '按鈕C', payload: 'customQR' },
     // ])
+
+    // Buttons
+    msgerAPI.sendTemplate(senderId, [
+      {
+        title: 'Template',
+        subtitle: '副標題',
+        buttons: [
+          {
+            type: 'web_url',
+            title: '按鈕A',
+            url: 'https://www.google.com'
+          },
+          {
+            type: 'postback',
+            title: '按鈕B',
+            payload: '測試'
+          }
+        ]
+      },
+    ])
   }
 })
 

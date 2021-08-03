@@ -74,6 +74,33 @@ const msgerAPI = {
       console.log(e.response?.data || e.message)
     }
   },
+
+  /**
+   * elements 不得超過 10 組, buttons 不得超過 3 組
+   * @see {@link https://developers.facebook.com/docs/messenger-platform/instagram/features/generic-template Generic Template}
+   * @see {@link https://developers.facebook.com/docs/messenger-platform/send-messages/buttons Buttons}
+   */
+  async sendTemplate(senderId: string, elements: TemplateElement[]) {
+    try {
+      const data: TemplateMsg = {
+        messaging_type: 'RESPONSE',
+        recipient: { id: senderId },
+        message: {
+          attachment: {
+            type: 'template',
+            payload: {
+              template_type: 'generic',
+              elements: elements,
+            },
+          },
+        },
+      }
+
+      await graphAPI.post('/', data)
+    } catch (e) {
+      console.log(e.response?.data || e.message)
+    }
+  },
 }
 
 
