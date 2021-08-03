@@ -7,34 +7,22 @@ const graphAPI = axios.create({
 })
 
 const msgerAPI = {
-  async sendText(senderId: string, text: string, quickReplies?: Array<string | quickReply>) {
+  async sendText(
+    senderId: string,
+    text: string,
+    quickReplies?: Array<string | QuickReply>
+  ) {
     try {
-      const data: textMsg = {
+      const data: TextMsg = {
         messaging_type: 'RESPONSE',
         recipient: { id: senderId },
         message: { text: text },
       }
 
-      const newQuickReplies = quickReplies?.map((reply): quickReply => {
-        if (typeof reply === 'string') {
-            // payload 只允許英數字
-            const normalizeString = reply.replace(/[^\w]+/g, '')
-            return {
-              content_type: 'text',
-              title: reply,
-              payload: `QR_${normalizeString}`,
-            }
-          }else {
-            const normalizeString = reply.title.replace(/[^\w]+/g, '')
-            return {
-              content_type: 'text',
-              payload: `QR_${normalizeString}`,
-              ...(reply as { title: string }),
-            }
-          }
-        })
-
-      if (newQuickReplies) { data.message.quick_replies = newQuickReplies }
+      if (quickReplies?.length) {
+        const newQuickReplies = this.formatQuickReplies(quickReplies)
+        data.message.quick_replies = newQuickReplies
+      }
 
       await graphAPI.post('/', data)
     } catch (e) {
@@ -42,17 +30,43 @@ const msgerAPI = {
     }
   },
 
-  async sendAttachment(senderId: string, url: string) {
+  /** 將 string 整理成 QuickReply 格式 */
+  formatQuickReplies(quickReplies: Array<string | QuickReply>) {
+    return quickReplies?.map((reply): QuickReply => {
+      if (typeof reply === 'string') {
+        // payload 只允許英數字
+        const normalizeString = reply.replace(/[^\w]+/g, '')
+        return {
+          content_type: 'text',
+          title: reply,
+          payload: `QR_${normalizeString}`,
+        }
+      } else {
+        const normalizeString = reply.title.replace(/[^\w]+/g, '')
+        return {
+          content_type: 'text',
+          payload: `QR_${normalizeString}`,
+          ...(reply as { title: string }),
+        }
+      }
+    })
+  },
+
+  async sendAttachment(senderId: string, type: AttachmentType, url: string) {
     try {
-      const data: attachmentMsg = {
+      let attachment: Attachment
+      if (type === 'image') {
+        attachment = { type, payload: { url } }
+      } else if (type === 'like_heart') {
+        attachment = { type }
+      } else {
+        attachment = { type, payload: { id: url } }
+      }
+
+      const data: AttachmentMsg = {
         messaging_type: 'RESPONSE',
         recipient: { id: senderId },
-        message: {
-          attachment: {
-            type: 'image',
-            payload: { url },
-          },
-        },
+        message: { attachment },
       }
 
       await graphAPI.post('/', data)

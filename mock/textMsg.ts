@@ -1,7 +1,7 @@
 /// <reference types="../src/msger" />
 import axios from 'axios'
 
-function textMsg(text: string): msgerBody {
+function textMsg(text: string): MsgerBody {
   return {
     "object": "instagram",
     "entry": [

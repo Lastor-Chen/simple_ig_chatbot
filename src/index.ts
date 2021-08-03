@@ -21,7 +21,7 @@ bot.app.use((req, res, next) => {
   next()
 })
 
-bot.on('text', (event: msgerEvent) => {
+bot.on('text', (event: MsgerEvent) => {
   console.log('接收 text')
   const senderMsg = event.message.text
   if (event.sender.id === 'mock') {
@@ -29,25 +29,28 @@ bot.on('text', (event: msgerEvent) => {
     console.log(`sender: ${senderMsg}`)
     console.log(`bot: ${senderMsg}`)
   } else {
+    const senderId = event.sender.id
+
     // 文字訊息
-    // msgerAPI.sendText(event.sender.id, `Auto reply: ${senderMsg}`)
+    // msgerAPI.sendText(senderId, `Auto reply: ${senderMsg}`)
 
     // 圖片
-    // msgerAPI.sendAttachment(
-    //   event.sender.id,
-    //   'https://i.gyazo.com/5f23b5bfdf8f11078275bc0a954471c2.png'
-    // )
+    msgerAPI.sendAttachment(
+      senderId,
+      'image',
+      'https://i.gyazo.com/5f23b5bfdf8f11078275bc0a954471c2.png'
+    )
 
     // quick reply text
-    msgerAPI.sendText(event.sender.id, '快速回覆', [
-      '按鈕A',
-      { title: '按鈕B', payload: 'testB' },
-      { title: '按鈕C', payload: 'customQR' },
-    ])
+    // msgerAPI.sendText(senderId, '快速回覆', [
+    //   '按鈕A',
+    //   { title: '按鈕B', payload: 'testB' },
+    //   { title: '按鈕C', payload: 'customQR' },
+    // ])
   }
 })
 
-bot.on('quickReply', (event: msgerEvent) => {
+bot.on('quickReply', (event: MsgerEvent) => {
   console.log('\n接收 quickReply')
 })
 

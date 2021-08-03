@@ -62,7 +62,7 @@ class Bot extends Events {
   }
 
   postWebhook(req: Request, res: Response) {
-    const body: msgerBody = req.body
+    const body: MsgerBody = req.body
     if (body.object === 'instagram') {
       this.handleMsgerData(body)
     }
@@ -71,7 +71,7 @@ class Bot extends Events {
     res.sendStatus(200)
   }
 
-  handleMsgerData(body: msgerBody) {
+  handleMsgerData(body: MsgerBody) {
     // Iterate over each entry. There may be multiple if batched.
     body.entry.forEach((entry) => {
       // Iterate over each messaging event

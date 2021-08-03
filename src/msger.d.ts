@@ -1,13 +1,13 @@
-interface msgerBody {
+interface MsgerBody {
   object: 'instagram'
   entry: {
     time: number
     id: string
-    messaging: msgerEvent[]
+    messaging: MsgerEvent[]
   }[]
 }
 
-interface msgerEvent {
+interface MsgerEvent {
   sender: { id: string }
   recipient: { id: string }
   timestamp: number
@@ -27,7 +27,7 @@ interface msgerEvent {
  * @see {@link https://developers.facebook.com/docs/messenger-platform/reference/send-api Send API}
  * @see {@link https://developers.facebook.com/docs/messenger-platform/instagram/features/send-message Instagram Messaging}
  */
-interface sendAPI {
+interface SendAPI {
   messaging_type: 'RESPONSE' | 'UPDATE' | 'MESSAGE_TAG'
   recipient: { id: string }
   message: {}
@@ -37,39 +37,51 @@ interface sendAPI {
  * ```
  * message: {
  *   text: string
- *   quick_replies?: quickReply[]
+ *   quick_replies?: QuickReply[]
  * }
  * ```
- * @see {@link sendAPI}
+ * @see {@link SendAPI}
  * @see {@link https://developers.facebook.com/docs/messenger-platform/reference/buttons/quick-replies Quick Replies}
  */
-interface textMsg extends sendAPI {
+interface TextMsg extends SendAPI {
   message: {
     text: string
-    quick_replies?: quickReply[]
+    quick_replies?: QuickReply[]
   }
 }
 
-/** @see {@link sendAPI} */
-interface attachmentMsg extends sendAPI {
+/** @see {@link SendAPI} */
+interface AttachmentMsg extends SendAPI {
   message: {
-    attachment: {
-      type: 'image' | 'audio' | 'video' | 'file'
-      payload: {
-        url: string
-        is_reusable?: boolean
-      }
-    }
+    attachment: Attachment
   }
+}
+
+type Attachment = AttachmentImage | AttachmentHeart | AttachmentShare
+type AttachmentType = 'image' | 'like_heart' | 'media_share'
+
+interface AttachmentImage {
+  type: 'image'
+  payload: { url: string }
+}
+
+interface AttachmentHeart {
+  type: 'like_heart'
+}
+
+/** 用法待確認 */
+interface AttachmentShare {
+  type: 'media_share'
+  payload: { id: string }
 }
 
 /**
  * Facebook Quick Replies
  * @see {@link https://developers.facebook.com/docs/messenger-platform/reference/buttons/quick-replies Quick Replies}
- * @see {@link sendAPI}
+ * @see {@link SendAPI}
  */
-interface quickReply {
-  content_type?: 'text' | 'user_phone_number' | 'user_email'
+interface QuickReply {
+  content_type?: 'text'
   title: string
   payload: string
   image_url?: string
