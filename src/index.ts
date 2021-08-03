@@ -15,6 +15,25 @@ const bot = new Bot({
   appSecret: process.env.APP_SECRET!,
 })
 
+// Set IG Messaging home page
+msgerAPI
+  .getIceBreakers()
+  .then(res => {
+    if (res?.data.length)
+      return console.log('iceBreakers has been set')
+
+    msgerAPI.setIceBreakers([
+      {
+        question: 'test btnA',
+        payload: '測試A',
+      },
+      {
+        question: 'test btnB',
+        payload: '測試B',
+      },
+    ])
+  })
+
 // log request for dev mode
 bot.app.use((req, res, next) => {
   console.log(`\n${req.method} ${req.path}`)

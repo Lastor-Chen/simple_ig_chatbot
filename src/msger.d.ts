@@ -179,3 +179,19 @@ interface GamePlayButton {
     context_id: string
   }
 }
+
+interface IceBreakerSetting {
+  platform: 'instagram'
+  ice_breakers: IceBreaker[]
+}
+
+interface IceBreaker {
+  question: string
+  payload: string
+}
+
+interface IceBreakerRes {
+  data: {
+    ice_breakers: IceBreaker[]
+  }[]
+}

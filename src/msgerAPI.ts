@@ -2,7 +2,7 @@ import axios from 'axios'
 
 const PAGE_ACCESS_TOKEN = process.env.PAGE_ACCESS_TOKEN
 const graphAPI = axios.create({
-  baseURL: 'https://graph.facebook.com/v11.0/me/messages',
+  baseURL: 'https://graph.facebook.com/v11.0/me',
   params: { access_token: PAGE_ACCESS_TOKEN },
 })
 
@@ -25,7 +25,7 @@ const msgerAPI = {
         data.message.quick_replies = newQuickReplies
       }
 
-      await graphAPI.post('/', data)
+      await graphAPI.post('/messages', data)
     } catch (e) {
       console.log(e.response?.data || e.message)
     }
@@ -70,7 +70,7 @@ const msgerAPI = {
         message: { attachment },
       }
 
-      await graphAPI.post('/', data)
+      await graphAPI.post('/messages', data)
     } catch (e) {
       console.log(e.response?.data || e.message)
     }
@@ -97,13 +97,43 @@ const msgerAPI = {
         },
       }
 
-      await graphAPI.post('/', data)
+      await graphAPI.post('/messages', data)
     } catch (e) {
       console.log(e.response?.data || e.message)
     }
   },
+
+  /**
+   * iceBreakers 最大為 4 組
+   * @see {@link https://developers.facebook.com/docs/messenger-platform/instagram/features/ice-breakers Ice Breakers}
+   */
+  async setIceBreakers(iceBreakers: IceBreaker[]) {
+    try {
+      const body: IceBreakerSetting = {
+        platform: 'instagram',
+        ice_breakers: iceBreakers,
+      }
+
+      const { data } = await graphAPI.post('/messenger_profile', body, {
+        params: { platform: 'instagram' },
+      })
+      if (data.result !== 'success') throw new Error('Set ice breakers failed')
+      console.log('Set ice breakers is successful')
+    } catch (e) {
+      console.log('setIceBreakers', e.response?.data || e.message)
+    }
+  },
+
+  async getIceBreakers() {
+    try {
+      const { data } = await graphAPI.get<IceBreakerRes>('/messenger_profile', {
+        params: { platform: 'instagram', fields: 'ice_breakers' },
+      })
+      return data
+    } catch (e) {
+      console.log('getIceBreakers', e.response?.data || e.message)
+    }
+  },
 }
-
-
 
 export default msgerAPI

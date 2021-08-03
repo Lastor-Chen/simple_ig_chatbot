@@ -98,8 +98,4 @@ class Bot extends Events {
   }
 }
 
-function isTextEvent(arg: MsgerEventType): arg is MsgerTextEvent {
-  return (<MsgerTextEvent>arg).message !== undefined
-}
-
 export default Bot
