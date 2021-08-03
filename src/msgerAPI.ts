@@ -7,6 +7,7 @@ const graphAPI = axios.create({
 })
 
 const msgerAPI = {
+  /** 快速回覆之 payload 限制是英數字元 */
   async sendText(
     senderId: string,
     text: string,

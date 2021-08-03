@@ -7,6 +7,12 @@ interface BotOptions {
   appSecret: string
 }
 
+interface Bot {
+  on(eventName: 'text', listener: (event: MsgerTextEvent) => void): this
+  on(eventName: 'quickReply', listener: (event: MsgerTextEvent) => void): this
+  on(eventName: 'postback', listener: (event: MsgerPostbackEvent) => void): this
+}
+
 class Bot extends Events {
   accessToken: string
   verifyToken: string
@@ -76,21 +82,24 @@ class Bot extends Events {
     body.entry.forEach((entry) => {
       // Iterate over each messaging event
       entry.messaging.forEach((event) => {
-        if (event.message?.is_echo) return void 0
+        if ('message' in event && event.message.is_echo) return void 0
 
         console.log('\nbody', body)
         console.log('messaging', entry.messaging)
 
-        if (event.message?.text) {
-          if (event.message?.quick_reply) {
-            this.emit('quickReply', event)
-          } else {
-            this.emit('text', event)
-          }
+        if ('message' in event) {
+          if (event.message.quick_reply) return this.emit('quickReply', event)
+          if (event.message.text) return this.emit('text', event)
+        } else if ('postback' in event) {
+          return this.emit('postback', event)
         }
       })
     })
   }
+}
+
+function isTextEvent(arg: MsgerEventType): arg is MsgerTextEvent {
+  return (<MsgerTextEvent>arg).message !== undefined
 }
 
 export default Bot

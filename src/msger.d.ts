@@ -3,7 +3,7 @@ interface MsgerBody {
   entry: {
     time: number
     id: string
-    messaging: MsgerEvent[]
+    messaging: Array<MsgerEventType>
   }[]
 }
 
@@ -11,11 +11,24 @@ interface MsgerEvent {
   sender: { id: string }
   recipient: { id: string }
   timestamp: number
+}
+
+type MsgerEventType = MsgerTextEvent | MsgerPostbackEvent
+
+interface MsgerTextEvent extends MsgerEvent {
   message: {
     mid: string
     text: string
     is_echo?: boolean
     quick_reply?: { payload: string }
+  }
+}
+
+interface MsgerPostbackEvent extends MsgerEvent {
+  postback: {
+    mid: string
+    title: string
+    payload: string
   }
 }
 

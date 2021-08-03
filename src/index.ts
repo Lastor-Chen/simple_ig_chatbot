@@ -21,8 +21,8 @@ bot.app.use((req, res, next) => {
   next()
 })
 
-bot.on('text', (event: MsgerEvent) => {
-  console.log('接收 text')
+bot.on('text', (event) => {
+  console.log('\n接收 text')
   const senderMsg = event.message.text
   if (event.sender.id === 'mock') {
     // mock 測試用
@@ -57,21 +57,27 @@ bot.on('text', (event: MsgerEvent) => {
           {
             type: 'web_url',
             title: '按鈕A',
-            url: 'https://www.google.com'
+            url: 'https://www.google.com',
           },
           {
             type: 'postback',
             title: '按鈕B',
-            payload: '測試'
-          }
-        ]
+            payload: '測試',
+          },
+        ],
       },
     ])
   }
 })
 
-bot.on('quickReply', (event: MsgerEvent) => {
+bot.on('quickReply', (event) => {
   console.log('\n接收 quickReply')
+  console.log(event)
+})
+
+bot.on('postback', (event) => {
+  console.log('\n接收 postback')
+  console.log(event)
 })
 
 bot.start(PORT)
