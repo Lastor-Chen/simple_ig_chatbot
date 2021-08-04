@@ -99,4 +99,9 @@ bot.on('postback', (event) => {
   console.log(event)
 })
 
+bot.on('attachments', (event) => {
+  console.log('\n接收 attachments')
+  console.log(event.message.attachments)
+})
+
 bot.start(PORT)

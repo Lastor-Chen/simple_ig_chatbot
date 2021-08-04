@@ -8,9 +8,10 @@ interface BotOptions {
 }
 
 interface Bot {
-  on(eventName: 'text', listener: (event: MsgerTextEvent) => void): this
-  on(eventName: 'quickReply', listener: (event: MsgerTextEvent) => void): this
-  on(eventName: 'postback', listener: (event: MsgerPostbackEvent) => void): this
+  on(event: 'text', cb: (event: MsgerTextEvent) => void): this
+  on(event: 'quickReply', cb: (event: MsgerQuickReplyEvent) => void): this
+  on(event: 'attachments', cb: (event: MsgerAttachmentsEvent) => void): this
+  on(event: 'postback', cb: (event: MsgerPostbackEvent) => void): this
 }
 
 class Bot extends Events {
@@ -87,9 +88,12 @@ class Bot extends Events {
         console.log('\nbody', body)
         console.log('messaging', entry.messaging)
 
-        if ('message' in event) {
-          if (event.message.quick_reply) return this.emit('quickReply', event)
-          if (event.message.text) return this.emit('text', event)
+        if ('message' in event && 'quick_reply' in event.message) {
+          return this.emit('quickReply', <MsgerQuickReplyEvent>event)
+        } else if ('message' in event && 'text' in event.message) {
+          return this.emit('text', <MsgerTextEvent>event)
+        } else if ('message' in event && 'attachments' in event.message) {
+          return this.emit('attachments', <MsgerAttachmentsEvent>event)
         } else if ('postback' in event) {
           return this.emit('postback', event)
         }
