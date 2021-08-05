@@ -36,50 +36,44 @@ receiver.app.use((req, res, next) => {
 receiver.on('text', (event) => {
   console.log('\n接收 text')
   const senderMsg = event.message.text
-  if (event.sender.id === 'mock') {
-    // mock 測試用
-    console.log(`sender: ${senderMsg}`)
-    console.log(`bot: ${senderMsg}`)
-  } else {
-    const senderId = event.sender.id
+  const senderId = event.sender.id
 
-    // 文字訊息
-    sender.sendText(senderId, `Auto reply: ${senderMsg}`)
+  // 文字訊息
+  sender.sendText(senderId, `Auto reply: ${senderMsg}`)
 
-    // 圖片
-    // sender.sendAttachment(
-    //   senderId,
-    //   'image',
-    //   'https://i.gyazo.com/5f23b5bfdf8f11078275bc0a954471c2.png'
-    // )
+  // 圖片
+  // sender.sendAttachment(
+  //   senderId,
+  //   'image',
+  //   'https://i.gyazo.com/5f23b5bfdf8f11078275bc0a954471c2.png'
+  // )
 
-    // quick reply text
-    // sender.sendText(senderId, '快速回覆', [
-    //   '按鈕A',
-    //   { title: '按鈕B', payload: 'testB' },
-    //   { title: '按鈕C', payload: 'customQR' },
-    // ])
+  // quick reply text
+  // sender.sendText(senderId, '快速回覆', [
+  //   '按鈕A',
+  //   { title: '按鈕B', payload: 'testB' },
+  //   { title: '按鈕C', payload: 'customQR' },
+  // ])
 
-    // Buttons
-    // sender.sendTemplate(senderId, [
-    //   {
-    //     title: 'Template',
-    //     subtitle: '副標題',
-    //     buttons: [
-    //       {
-    //         type: 'web_url',
-    //         title: '按鈕A',
-    //         url: 'https://www.google.com',
-    //       },
-    //       {
-    //         type: 'postback',
-    //         title: '按鈕B',
-    //         payload: '測試',
-    //       },
-    //     ],
-    //   },
-    // ])
-  }
+  // Buttons
+  // sender.sendTemplate(senderId, [
+  //   {
+  //     title: 'Template',
+  //     subtitle: '副標題',
+  //     buttons: [
+  //       {
+  //         type: 'web_url',
+  //         title: '按鈕A',
+  //         url: 'https://www.google.com',
+  //       },
+  //       {
+  //         type: 'postback',
+  //         title: '按鈕B',
+  //         payload: '測試',
+  //       },
+  //     ],
+  //   },
+  // ])
 })
 
 receiver.on('quickReply', (event) => {
