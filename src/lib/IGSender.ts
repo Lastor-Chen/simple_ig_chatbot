@@ -14,7 +14,7 @@ class IGSender {
 
   #initAxios() {
     return axios.create({
-      baseURL: 'https://graph.facebook.com/v11.0/me',
+      baseURL: 'https://graph.facebook.com/v11.0',
       params: { access_token: this.#accessToken },
     })
   }
@@ -49,7 +49,7 @@ class IGSender {
         data.message.quick_replies = newQuickReplies
       }
 
-      await this.graphAPI.post('/messages', data)
+      await this.graphAPI.post('/me/messages', data)
     } catch (e) {
       this.handleError(e)
     }
@@ -98,7 +98,7 @@ class IGSender {
         message: { attachment },
       }
 
-      await this.graphAPI.post('/messages', data)
+      await this.graphAPI.post('/me/messages', data)
     } catch (e) {
       this.handleError(e)
     }
@@ -125,7 +125,7 @@ class IGSender {
         },
       }
 
-      await this.graphAPI.post('/messages', data)
+      await this.graphAPI.post('/me/messages', data)
     } catch (e) {
       this.handleError(e)
     }
@@ -142,7 +142,7 @@ class IGSender {
         ice_breakers: iceBreakers,
       }
 
-      const { data } = await this.graphAPI.post('/messenger_profile', body, {
+      const { data } = await this.graphAPI.post('/me/messenger_profile', body, {
         params: { platform: 'instagram' },
       })
       if (data.result !== 'success') throw new Error('Set ice breakers failed')
@@ -159,7 +159,7 @@ class IGSender {
   async getIceBreakers() {
     try {
       const { data } = await this.graphAPI.get<IceBreakerRes>(
-        '/messenger_profile',
+        '/me/messenger_profile',
         {
           params: {
             platform: 'instagram',
@@ -167,6 +167,31 @@ class IGSender {
           },
         }
       )
+      return data
+    } catch (e) {
+      this.handleError(e)
+    }
+  }
+
+  /**
+   * Get Instagram user's profile information
+   * @see {@link https://developers.facebook.com/docs/messenger-platform/instagram/features/user-profile User Profile}
+   */
+  async getUserProfile(IGSID: string, fields?: Array<'name' | 'profile_pci'>) {
+    try {
+      // Remove the same field
+      const fieldSet = new Set(fields)
+
+      const { data } = await this.graphAPI.get<{
+        id: string
+        name?: string
+        profile_pic?: string
+      }>(`/${IGSID}`, {
+        params: {
+          fields: [...fieldSet].join(',') || 'name',
+        },
+      })
+
       return data
     } catch (e) {
       this.handleError(e)

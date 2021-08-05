@@ -33,13 +33,16 @@ receiver.app.use((req, res, next) => {
   next()
 })
 
-receiver.on('text', (event) => {
+receiver.on('text', async (event) => {
   console.log('\n接收 text')
   const senderMsg = event.message.text
   const senderId = event.sender.id
+  console.log('sid', senderId)
+
+  const user = await sender.getUserProfile(senderId)
 
   // 文字訊息
-  sender.sendText(senderId, `Auto reply: ${senderMsg}`)
+  sender.sendText(senderId, `${user?.name} said: ${senderMsg}`)
 
   // 圖片
   // sender.sendAttachment(
