@@ -58,11 +58,7 @@ interface MsgerPostbackEvent extends MsgerEvent {
 // Send API
 // =================
 
-/**
- * Facebook SendAPI
- * @see {@link https://developers.facebook.com/docs/messenger-platform/reference/send-api Send API}
- * @see {@link https://developers.facebook.com/docs/messenger-platform/instagram/features/send-message Instagram Messaging}
- */
+/** Facebook SendAPI request interface */
 interface SendAPI {
   messaging_type: 'RESPONSE' | 'UPDATE' | 'MESSAGE_TAG'
   recipient: { id: string }
@@ -76,8 +72,7 @@ interface SendAPI {
  *   quick_replies?: QuickReply[]
  * }
  * ```
- * @see {@link SendAPI}
- * @see {@link https://developers.facebook.com/docs/messenger-platform/reference/buttons/quick-replies Quick Replies}
+ * @see {@link SendAPI extends SendAPI}
  */
 interface TextMsg extends SendAPI {
   message: {
@@ -86,7 +81,14 @@ interface TextMsg extends SendAPI {
   }
 }
 
-/** @see {@link SendAPI} */
+interface QuickReply {
+  content_type?: 'text'
+  title: string
+  payload: string
+  image_url?: string
+}
+
+/** @see {@link SendAPI extends SendAPI} */
 interface AttachmentMsg extends SendAPI {
   message: {
     attachment: Attachment
@@ -112,18 +114,6 @@ interface AttachmentShare {
 }
 
 /**
- * Facebook Quick Replies
- * @see {@link https://developers.facebook.com/docs/messenger-platform/reference/buttons/quick-replies Quick Replies}
- * @see {@link SendAPI}
- */
-interface QuickReply {
-  content_type?: 'text'
-  title: string
-  payload: string
-  image_url?: string
-}
-
-/**
  * IG Generic Template
  * @see {@link SendAPI}
  */
@@ -133,7 +123,6 @@ interface TemplateMsg extends SendAPI {
       type: 'template'
       payload: {
         template_type: 'generic'
-        /** 最大 10 個, 除了 title 之外, 至少需再設置一個屬性 */
         elements: TemplateElement[]
       }
     }

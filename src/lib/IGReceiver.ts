@@ -1,32 +1,30 @@
 import Events from 'events'
-import express, { Request, Response } from 'express'
+import express from 'express'
+import type { Request, Response } from 'express'
 
-interface BotOptions {
-  accessToken: string
+interface IGReceiverOptions {
   verifyToken: string
   appSecret: string
 }
 
-interface Bot {
+interface IGReceiver {
   on(event: 'text', cb: (event: MsgerTextEvent) => void): this
   on(event: 'quickReply', cb: (event: MsgerQuickReplyEvent) => void): this
   on(event: 'attachments', cb: (event: MsgerAttachmentsEvent) => void): this
   on(event: 'postback', cb: (event: MsgerPostbackEvent) => void): this
 }
 
-class Bot extends Events {
-  accessToken: string
+class IGReceiver extends Events {
   verifyToken: string
   appSecret: string
 
   app = express()
 
-  constructor(options: BotOptions) {
+  constructor(options: IGReceiverOptions) {
     super()
-    if (!options.accessToken || !options.verifyToken || !options.appSecret) {
-      throw new Error('accessToken, verifyToken or appSecret is required')
+    if (!options.verifyToken || !options.appSecret) {
+      throw new Error('verifyToken or appSecret is required')
     }
-    this.accessToken = options.accessToken
     this.verifyToken = options.verifyToken
     this.appSecret = options.appSecret
     this.configExpress()
@@ -102,4 +100,4 @@ class Bot extends Events {
   }
 }
 
-export default Bot
+export default IGReceiver

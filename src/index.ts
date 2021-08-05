@@ -5,42 +5,35 @@ if (process.env.NODE_ENV !== 'production') {
   require('dotenv').config()
 }
 
-import Bot from '@/lib/Bot'
-import msgerAPI from '@/msgerAPI'
+import IGReceiver from '@/lib/IGReceiver'
+import IGSender from '@/lib/IGSender'
 
 const PORT = process.env.PORT || 3000
-const bot = new Bot({
-  accessToken: process.env.PAGE_ACCESS_TOKEN!,
+const receiver = new IGReceiver({
   verifyToken: process.env.VERIFY_TOKEN!,
   appSecret: process.env.APP_SECRET!,
 })
+const sender = new IGSender(process.env.PAGE_ACCESS_TOKEN!)
 
 // Set IG Messaging home page
-msgerAPI
-  .getIceBreakers()
-  .then(res => {
-    if (res?.data.length)
-      return console.log('iceBreakers has been set')
-
-    msgerAPI.setIceBreakers([
-      {
-        question: 'test btnA',
-        payload: '測試A',
-      },
-      {
-        question: 'test btnB',
-        payload: '測試B',
-      },
-    ])
-  })
+sender.setIceBreakers([
+  {
+    question: 'test btnA',
+    payload: '測試A',
+  },
+  {
+    question: 'test btnB',
+    payload: '測試B',
+  },
+])
 
 // log request for dev mode
-bot.app.use((req, res, next) => {
+receiver.app.use((req, res, next) => {
   console.log(`\n${req.method} ${req.path}`)
   next()
 })
 
-bot.on('text', (event) => {
+receiver.on('text', (event) => {
   console.log('\n接收 text')
   const senderMsg = event.message.text
   if (event.sender.id === 'mock') {
@@ -51,57 +44,57 @@ bot.on('text', (event) => {
     const senderId = event.sender.id
 
     // 文字訊息
-    // msgerAPI.sendText(senderId, `Auto reply: ${senderMsg}`)
+    sender.sendText(senderId, `Auto reply: ${senderMsg}`)
 
     // 圖片
-    // msgerAPI.sendAttachment(
+    // sender.sendAttachment(
     //   senderId,
     //   'image',
     //   'https://i.gyazo.com/5f23b5bfdf8f11078275bc0a954471c2.png'
     // )
 
     // quick reply text
-    // msgerAPI.sendText(senderId, '快速回覆', [
+    // sender.sendText(senderId, '快速回覆', [
     //   '按鈕A',
     //   { title: '按鈕B', payload: 'testB' },
     //   { title: '按鈕C', payload: 'customQR' },
     // ])
 
     // Buttons
-    msgerAPI.sendTemplate(senderId, [
-      {
-        title: 'Template',
-        subtitle: '副標題',
-        buttons: [
-          {
-            type: 'web_url',
-            title: '按鈕A',
-            url: 'https://www.google.com',
-          },
-          {
-            type: 'postback',
-            title: '按鈕B',
-            payload: '測試',
-          },
-        ],
-      },
-    ])
+    // sender.sendTemplate(senderId, [
+    //   {
+    //     title: 'Template',
+    //     subtitle: '副標題',
+    //     buttons: [
+    //       {
+    //         type: 'web_url',
+    //         title: '按鈕A',
+    //         url: 'https://www.google.com',
+    //       },
+    //       {
+    //         type: 'postback',
+    //         title: '按鈕B',
+    //         payload: '測試',
+    //       },
+    //     ],
+    //   },
+    // ])
   }
 })
 
-bot.on('quickReply', (event) => {
+receiver.on('quickReply', (event) => {
   console.log('\n接收 quickReply')
   console.log(event)
 })
 
-bot.on('postback', (event) => {
+receiver.on('postback', (event) => {
   console.log('\n接收 postback')
   console.log(event)
 })
 
-bot.on('attachments', (event) => {
+receiver.on('attachments', (event) => {
   console.log('\n接收 attachments')
   console.log(event.message.attachments)
 })
 
-bot.start(PORT)
+receiver.start(PORT)
