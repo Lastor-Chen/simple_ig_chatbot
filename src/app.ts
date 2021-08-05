@@ -1,12 +1,9 @@
-/// <reference types="./msger" />
-
 // 開發環境, 載入環境變數
 if (process.env.NODE_ENV !== 'production') {
   require('dotenv').config()
 }
 
-import IGReceiver from '@/lib/IGReceiver'
-import IGSender from '@/lib/IGSender'
+import { IGReceiver, IGSender } from './lib'
 
 const PORT = process.env.PORT || 3000
 const receiver = new IGReceiver({

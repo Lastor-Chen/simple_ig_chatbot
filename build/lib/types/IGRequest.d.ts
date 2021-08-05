@@ -1,64 +1,6 @@
-interface MsgerBody {
-  object: 'instagram'
-  entry: {
-    time: number
-    id: string
-    messaging: Array<MsgerEventType>
-  }[]
-}
+// Declare Instagram send API request
+// https://developers.facebook.com/docs/messenger-platform/instagram/features/send-message
 
-interface MsgerEvent {
-  sender: { id: string }
-  recipient: { id: string }
-  timestamp: number
-}
-
-type MsgerEventType =
-  | MsgerTextEvent
-  | MsgerQuickReplyEvent
-  | MsgerAttachmentsEvent
-  | MsgerPostbackEvent
-
-interface MsgerTextEvent extends MsgerEvent {
-  message: {
-    mid: string
-    text: string
-    is_echo?: boolean
-  }
-}
-
-interface MsgerQuickReplyEvent extends MsgerEvent {
-  message: {
-    mid: string
-    text: string
-    quick_reply: { payload: string }
-    is_echo?: boolean
-  }
-}
-
-interface MsgerAttachmentsEvent extends MsgerEvent {
-  message: {
-    mid: string
-    attachments: {
-      type: 'image' | 'story_mention'
-      payload: { url: string }
-    }[]
-    is_echo?: boolean
-  }
-}
-
-interface MsgerPostbackEvent extends MsgerEvent {
-  postback: {
-    mid: string
-    title: string
-    payload: string
-  }
-}
-
-// Send API
-// =================
-
-/** Facebook SendAPI request interface */
 interface SendAPI {
   messaging_type: 'RESPONSE' | 'UPDATE' | 'MESSAGE_TAG'
   recipient: { id: string }
@@ -149,7 +91,7 @@ type ButtonType =
   | PostbackButton
   | CallButton
   | LoginButton
-  | LoginButton
+  | LogoutButton
   | GamePlayButton
 
 interface URLButton {
@@ -176,7 +118,7 @@ interface LoginButton {
   url: string
 }
 
-interface LoginButton {
+interface LogoutButton {
   type: 'account_unlink'
 }
 
