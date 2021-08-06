@@ -19,7 +19,7 @@ class IGSender {
     })
   }
 
-  handleError(err: any) {
+  #handleError(err: any) {
     console.log(err.message)
     if (axios.isAxiosError(err)) {
       console.log(err.response?.data)
@@ -51,7 +51,7 @@ class IGSender {
 
       await this.graphAPI.post('/me/messages', data)
     } catch (e) {
-      this.handleError(e)
+      this.#handleError(e)
     }
   }
 
@@ -100,7 +100,7 @@ class IGSender {
 
       await this.graphAPI.post('/me/messages', data)
     } catch (e) {
-      this.handleError(e)
+      this.#handleError(e)
     }
   }
 
@@ -127,7 +127,7 @@ class IGSender {
 
       await this.graphAPI.post('/me/messages', data)
     } catch (e) {
-      this.handleError(e)
+      this.#handleError(e)
     }
   }
 
@@ -148,7 +148,7 @@ class IGSender {
       if (data.result !== 'success') throw new Error('Set ice breakers failed')
       console.log('Set ice breakers is successful')
     } catch (e) {
-      this.handleError(e)
+      this.#handleError(e)
     }
   }
 
@@ -169,7 +169,7 @@ class IGSender {
       )
       return data
     } catch (e) {
-      this.handleError(e)
+      this.#handleError(e)
     }
   }
 
@@ -194,7 +194,7 @@ class IGSender {
 
       return data
     } catch (e) {
-      this.handleError(e)
+      this.#handleError(e)
     }
   }
 }

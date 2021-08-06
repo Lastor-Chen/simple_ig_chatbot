@@ -3,7 +3,8 @@ if (process.env.NODE_ENV !== 'production') {
   require('dotenv').config()
 }
 
-import { IGReceiver, IGSender } from './lib'
+import { IGReceiver, IGSender } from '@/lib'
+import { basicSend } from '@/basicSend'
 
 const PORT = process.env.PORT || 3000
 const receiver = new IGReceiver({
@@ -19,8 +20,8 @@ sender.setIceBreakers([
     payload: '測試A',
   },
   {
-    question: 'test btnB',
-    payload: '測試B',
+    question: '測試連續對話',
+    payload: 'convo',
   },
 ])
 
@@ -32,48 +33,16 @@ receiver.app.use((req, res, next) => {
 
 receiver.on('text', async (event) => {
   console.log('\n接收 text')
-  const senderMsg = event.message.text
-  const senderId = event.sender.id
-  console.log('sid', senderId)
-
-  const user = await sender.getUserProfile(senderId)
-
-  // 文字訊息
-  sender.sendText(senderId, `${user?.name} said: ${senderMsg}`)
-
-  // 圖片
-  // sender.sendAttachment(
-  //   senderId,
-  //   'image',
-  //   'https://i.gyazo.com/5f23b5bfdf8f11078275bc0a954471c2.png'
-  // )
-
-  // quick reply text
-  // sender.sendText(senderId, '快速回覆', [
-  //   '按鈕A',
-  //   { title: '按鈕B', payload: 'testB' },
-  //   { title: '按鈕C', payload: 'customQR' },
-  // ])
-
-  // Buttons
-  // sender.sendTemplate(senderId, [
-  //   {
-  //     title: 'Template',
-  //     subtitle: '副標題',
-  //     buttons: [
-  //       {
-  //         type: 'web_url',
-  //         title: '按鈕A',
-  //         url: 'https://www.google.com',
-  //       },
-  //       {
-  //         type: 'postback',
-  //         title: '按鈕B',
-  //         payload: '測試',
-  //       },
-  //     ],
-  //   },
-  // ])
+  sender.sendTemplate(event.sender.id, [{
+    title: '請選擇',
+    buttons: [
+      {
+        type: 'postback',
+        title: '常用訊息範例',
+        payload: 'basic_send',
+      }
+    ]
+  }])
 })
 
 receiver.on('quickReply', (event) => {
@@ -83,7 +52,9 @@ receiver.on('quickReply', (event) => {
 
 receiver.on('postback', (event) => {
   console.log('\n接收 postback')
-  console.log(event)
+  if (event.postback.payload === 'basic_send') {
+    basicSend(event, sender)
+  }
 })
 
 receiver.on('attachments', (event) => {
