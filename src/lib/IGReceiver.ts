@@ -69,11 +69,10 @@ class IGReceiver extends Events {
   postWebhook(req: Request, res: Response) {
     const body: MsgerBody = req.body
     if (body.object === 'instagram') {
+      // Must send back a 200 within 20 seconds or the request will time out.
+      res.sendStatus(200)
       this.handleMsgerData(body)
     }
-
-    // Must send back a 200 within 20 seconds or the request will time out.
-    res.sendStatus(200)
   }
 
   handleMsgerData(body: MsgerBody) {
@@ -81,17 +80,17 @@ class IGReceiver extends Events {
     body.entry.forEach((entry) => {
       // Iterate over each messaging event
       entry.messaging.forEach((event) => {
-        if ('message' in event && event.message.is_echo) return void 0
+        if ((<MsgerTextEvent>event).message?.is_echo) return void 0
+        console.log('\nmessaging', entry.messaging)
 
-        console.log('\nbody', body)
-        console.log('messaging', entry.messaging)
-
-        if ('message' in event && 'quick_reply' in event.message) {
-          return this.emit('quickReply', <MsgerQuickReplyEvent>event)
-        } else if ('message' in event && 'text' in event.message) {
-          return this.emit('text', <MsgerTextEvent>event)
-        } else if ('message' in event && 'attachments' in event.message) {
-          return this.emit('attachments', <MsgerAttachmentsEvent>event)
+        if ('message' in event) {
+          if ('quick_reply' in event.message) {
+            return this.emit('quickReply', <MsgerQuickReplyEvent>event)
+          } else if ('attachments' in event.message) {
+            return this.emit('attachments', <MsgerAttachmentsEvent>event)
+          } else if ('text' in event.message) {
+            return this.emit('text', <MsgerTextEvent>event)
+          }
         } else if ('postback' in event) {
           return this.emit('postback', event)
         }

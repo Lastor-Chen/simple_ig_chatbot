@@ -1,4 +1,4 @@
-import type { IGSender } from "./lib"
+import type { IGSender } from "@/lib"
 
 export async function basicSend(event: MsgerPostbackEvent, sender: IGSender) {
   const senderMsg = event.postback.title
