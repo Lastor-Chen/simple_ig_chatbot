@@ -81,14 +81,14 @@ class IGSender {
    * Send attachment. Attachment type is different from Messenger
    * @see {@link https://developers.facebook.com/docs/messenger-platform/instagram/features/send-message Instagram Messaging}
    */
-  async sendAttachment(receiver: string, type: AttachmentType, url: string) {
+  async sendAttachment(receiver: string, type: AttachmentType, url: string = '') {
     try {
       let attachment: Attachment
       if (type === 'image') {
         attachment = { type, payload: { url } }
       } else if (type === 'like_heart') {
         attachment = { type }
-      } else {
+      } else if (type === 'media_share') {
         attachment = { type, payload: { id: url } }
       }
 
