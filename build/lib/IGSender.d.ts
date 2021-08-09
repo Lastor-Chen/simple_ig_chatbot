@@ -5,7 +5,6 @@ declare class IGSender {
     #private;
     graphAPI: AxiosInstance;
     constructor(accessToken: string);
-    handleError(err: any): void;
     /**
      * Send message with text or quick replies. QuickReply payload is English and numbers only.
      * @see {@link https://developers.facebook.com/docs/messenger-platform/reference/send-api#message Send Message API}
@@ -17,7 +16,7 @@ declare class IGSender {
      * Send attachment. Attachment type is different from Messenger
      * @see {@link https://developers.facebook.com/docs/messenger-platform/instagram/features/send-message Instagram Messaging}
      */
-    sendAttachment(receiver: string, type: AttachmentType, url: string): Promise<void>;
+    sendAttachment(receiver: string, type: AttachmentType, url?: string): Promise<void>;
     /**
      * Send Template that supports a maximum of 10 elements per message and 3 buttons per element
      * @see {@link https://developers.facebook.com/docs/messenger-platform/instagram/features/generic-template Generic Template}

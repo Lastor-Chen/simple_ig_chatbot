@@ -88,7 +88,7 @@ class IGSender {
         attachment = { type, payload: { url } }
       } else if (type === 'like_heart') {
         attachment = { type }
-      } else if (type === 'media_share') {
+      } else {
         attachment = { type, payload: { id: url } }
       }
 

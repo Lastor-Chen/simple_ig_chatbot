@@ -12,7 +12,7 @@ export const opening: TemplateElement[] = [
       {
         type: 'postback',
         title: '連續對話A',
-        payload: 'convo_a',
+        payload: 'convo',
       },
     ],
   },

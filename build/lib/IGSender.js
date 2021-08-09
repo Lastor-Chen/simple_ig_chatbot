@@ -13,7 +13,7 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-var _IGSender_instances, _IGSender_accessToken, _IGSender_initAxios, _IGSender_formatQuickReplies;
+var _IGSender_instances, _IGSender_accessToken, _IGSender_initAxios, _IGSender_handleError, _IGSender_formatQuickReplies;
 Object.defineProperty(exports, "__esModule", { value: true });
 const axios_1 = __importDefault(require("axios"));
 /** Instagram Messaging sender API */
@@ -25,12 +25,6 @@ class IGSender {
             throw new Error('accessToken is required');
         __classPrivateFieldSet(this, _IGSender_accessToken, accessToken, "f");
         this.graphAPI = __classPrivateFieldGet(this, _IGSender_instances, "m", _IGSender_initAxios).call(this);
-    }
-    handleError(err) {
-        console.log(err.message);
-        if (axios_1.default.isAxiosError(err)) {
-            console.log(err.response?.data);
-        }
     }
     /**
      * Send message with text or quick replies. QuickReply payload is English and numbers only.
@@ -52,14 +46,14 @@ class IGSender {
             await this.graphAPI.post('/me/messages', data);
         }
         catch (e) {
-            this.handleError(e);
+            __classPrivateFieldGet(this, _IGSender_instances, "m", _IGSender_handleError).call(this, e);
         }
     }
     /**
      * Send attachment. Attachment type is different from Messenger
      * @see {@link https://developers.facebook.com/docs/messenger-platform/instagram/features/send-message Instagram Messaging}
      */
-    async sendAttachment(receiver, type, url) {
+    async sendAttachment(receiver, type, url = '') {
         try {
             let attachment;
             if (type === 'image') {
@@ -79,7 +73,7 @@ class IGSender {
             await this.graphAPI.post('/me/messages', data);
         }
         catch (e) {
-            this.handleError(e);
+            __classPrivateFieldGet(this, _IGSender_instances, "m", _IGSender_handleError).call(this, e);
         }
     }
     /**
@@ -105,7 +99,7 @@ class IGSender {
             await this.graphAPI.post('/me/messages', data);
         }
         catch (e) {
-            this.handleError(e);
+            __classPrivateFieldGet(this, _IGSender_instances, "m", _IGSender_handleError).call(this, e);
         }
     }
     /**
@@ -126,7 +120,7 @@ class IGSender {
             console.log('Set ice breakers is successful');
         }
         catch (e) {
-            this.handleError(e);
+            __classPrivateFieldGet(this, _IGSender_instances, "m", _IGSender_handleError).call(this, e);
         }
     }
     /**
@@ -144,7 +138,7 @@ class IGSender {
             return data;
         }
         catch (e) {
-            this.handleError(e);
+            __classPrivateFieldGet(this, _IGSender_instances, "m", _IGSender_handleError).call(this, e);
         }
     }
     /**
@@ -163,7 +157,7 @@ class IGSender {
             return data;
         }
         catch (e) {
-            this.handleError(e);
+            __classPrivateFieldGet(this, _IGSender_instances, "m", _IGSender_handleError).call(this, e);
         }
     }
 }
@@ -172,6 +166,11 @@ _IGSender_accessToken = new WeakMap(), _IGSender_instances = new WeakSet(), _IGS
         baseURL: 'https://graph.facebook.com/v11.0',
         params: { access_token: __classPrivateFieldGet(this, _IGSender_accessToken, "f") },
     });
+}, _IGSender_handleError = function _IGSender_handleError(err) {
+    console.log(err.message);
+    if (axios_1.default.isAxiosError(err)) {
+        console.log(err.response?.data);
+    }
 }, _IGSender_formatQuickReplies = function _IGSender_formatQuickReplies(quickReplies) {
     return quickReplies.map((reply) => {
         if (typeof reply === 'string') {

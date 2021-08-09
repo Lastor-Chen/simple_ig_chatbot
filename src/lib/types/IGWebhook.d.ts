@@ -10,17 +10,13 @@ interface MsgerBody {
   }[]
 }
 
+type MsgerEventType = MsgerTextEvent | MsgerQuickReplyEvent | MsgerAttachmentsEvent | MsgerPostbackEvent
+
 interface MsgerEvent {
   sender: { id: string }
   recipient: { id: string }
   timestamp: number
 }
-
-type MsgerEventType =
-  | MsgerTextEvent
-  | MsgerQuickReplyEvent
-  | MsgerAttachmentsEvent
-  | MsgerPostbackEvent
 
 interface MsgerTextEvent extends MsgerEvent {
   message: {

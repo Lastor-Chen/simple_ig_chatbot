@@ -45,28 +45,29 @@ class IGReceiver extends events_1.default {
     postWebhook(req, res) {
         const body = req.body;
         if (body.object === 'instagram') {
+            // Must send back a 200 within 20 seconds or the request will time out.
+            res.sendStatus(200);
             this.handleMsgerData(body);
         }
-        // Must send back a 200 within 20 seconds or the request will time out.
-        res.sendStatus(200);
     }
     handleMsgerData(body) {
         // Iterate over each entry. There may be multiple if batched.
         body.entry.forEach((entry) => {
             // Iterate over each messaging event
             entry.messaging.forEach((event) => {
-                if ('message' in event && event.message.is_echo)
+                if (event.message?.is_echo)
                     return void 0;
-                console.log('\nbody', body);
-                console.log('messaging', entry.messaging);
-                if ('message' in event && 'quick_reply' in event.message) {
-                    return this.emit('quickReply', event);
-                }
-                else if ('message' in event && 'text' in event.message) {
-                    return this.emit('text', event);
-                }
-                else if ('message' in event && 'attachments' in event.message) {
-                    return this.emit('attachments', event);
+                console.log('\nmessaging', entry.messaging);
+                if ('message' in event) {
+                    if ('quick_reply' in event.message) {
+                        return this.emit('quickReply', event);
+                    }
+                    else if ('attachments' in event.message) {
+                        return this.emit('attachments', event);
+                    }
+                    else if ('text' in event.message) {
+                        return this.emit('text', event);
+                    }
                 }
                 else if ('postback' in event) {
                     return this.emit('postback', event);
