@@ -25,7 +25,7 @@ async function convoA(event: MsgerPostbackEvent | MsgerTextEvent, sender: IGSend
   if (!val) {
     users.push({ id: sid, step: 'step_a', data: {} })
 
-    console.log('start conversation')
+    console.log('start conversation A')
     return sender.sendTemplate(sid, [
       {
         title: '請選擇種族',

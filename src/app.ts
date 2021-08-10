@@ -7,6 +7,7 @@ import { IGReceiver, IGSender } from '@/lib'
 import { basicSend } from '@/basicSend'
 import { convoA, users } from '@/convoA'
 import { opening } from '@/services/messages'
+import { convoB } from '@/convoB'
 
 const PORT = process.env.PORT || 3000
 const receiver = new IGReceiver({
@@ -45,24 +46,48 @@ receiver.on('text', async (event) => {
   }
 })
 
-receiver.on('quickReply', (event) => {
-  console.log('\n接收 quickReply')
-  console.log(event)
-})
-
 receiver.on('postback', (event) => {
   console.log('\n接收 postback')
+  const sid = event.sender.id
 
   const [type, _] = event.postback.payload.split(':')
-  if (type === 'basic_send') return basicSend(event, sender)
-  else if (type === 'convo') {
+  if (type === 'basic_send') {
+    basicSend(event, sender)
+  } else if (type === 'convo') {
     convoA(event, sender)
+  } else if (type === 'convo_b') {
+    // convo B
+    receiver.state.set(sid, { step: 'step_a' })
+
+    // question
+    console.log('start conversation B')
+    sender.sendTemplate(sid, [
+      {
+        title: '請選擇種族',
+        buttons: [
+          {
+            type: 'postback',
+            title: '人類',
+            payload: 'step_a',
+          },
+          {
+            type: 'postback',
+            title: '精靈',
+            payload: 'step_a',
+          },
+          {
+            type: 'postback',
+            title: '半獸人',
+            payload: 'step_a',
+          },
+        ],
+      },
+    ])
+  } else {
+    sender.sendText(sid, '無效按鈕')
   }
 })
 
-receiver.on('attachments', (event) => {
-  console.log('\n接收 attachments')
-  console.log(event.message.attachments)
-})
+convoB(receiver, sender)
 
 receiver.start(PORT)

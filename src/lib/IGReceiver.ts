@@ -12,6 +12,7 @@ interface IGReceiver {
   on(event: 'quickReply', cb: (event: MsgerQuickReplyEvent) => void): this
   on(event: 'attachments', cb: (event: MsgerAttachmentsEvent) => void): this
   on(event: 'postback', cb: (event: MsgerPostbackEvent) => void): this
+  on<T>(step: string, cb: (event: MsgerEventType, userState: T, userId: string) => void): this
 }
 
 class IGReceiver extends Events {
@@ -19,6 +20,7 @@ class IGReceiver extends Events {
   appSecret: string
 
   app = express()
+  state = new Map()
 
   constructor(options: IGReceiverOptions) {
     super()
@@ -45,11 +47,9 @@ class IGReceiver extends Events {
   initWebhook() {
     // Verify webhook callback URL
     this.app.get('/webhook', (req, res) => {
-      const {
-        'hub.mode': mode,
-        'hub.verify_token': token,
-        'hub.challenge': challenge,
-      } = req.query
+      const mode = req.query['hub.mode']
+      const token = req.query['hub.verify_token']
+      const challenge = req.query['hub.challenge']
 
       if (mode !== 'subscribe' || token !== this.verifyToken) {
         console.log('Failed validation. Make sure the validation tokens match')
@@ -83,7 +83,12 @@ class IGReceiver extends Events {
         if ((<MsgerTextEvent>event).message?.is_echo) return void 0
         console.log('\nmessaging', entry.messaging)
 
-        if ('message' in event) {
+        const sid = event.sender.id
+
+        if (this.state.has(sid)) {
+          const userState = this.state.get(sid)
+          return this.emit(userState.step, event, userState, sid)
+        } else if ('message' in event) {
           if ('quick_reply' in event.message) {
             return this.emit('quickReply', <MsgerQuickReplyEvent>event)
           } else if ('attachments' in event.message) {
@@ -96,6 +101,16 @@ class IGReceiver extends Events {
         }
       })
     })
+  }
+
+  /** Delete user's state to end a conversation */
+  endConversation(userId: string) {
+    if (this.state.has(userId)) {
+      console.log("Can't found user in conversation")
+      return false
+    }
+
+    return this.state.delete(userId)
   }
 }
 

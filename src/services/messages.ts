@@ -14,6 +14,11 @@ export const opening: TemplateElement[] = [
         title: '連續對話A',
         payload: 'convo',
       },
+      {
+        type: 'postback',
+        title: '連續對話B',
+        payload: 'convo_b'
+      }
     ],
   },
 ]
