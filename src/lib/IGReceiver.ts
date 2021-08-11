@@ -1,6 +1,8 @@
 import Events from 'events'
 import express from 'express'
+import crypto from 'crypto'
 import type { Request, Response } from 'express'
+import type { IncomingMessage, ServerResponse } from 'http'
 
 interface IGReceiverOptions {
   verifyToken: string
@@ -44,8 +46,35 @@ class IGReceiver extends Events {
   }
 
   #configExpress() {
-    this.app.use(express.json()) // 解析 request json body
-    this.app.use(express.urlencoded({ extended: true })) // 解析 queryString
+    // Parse application/json
+    this.app.use(
+      this.#webhook,
+      express.json({
+        verify: (req, res, buf) => this.#verifyRequestSignature(req, res, buf),
+      })
+    )
+    // Parse queryString application/x-www-form-urlencoded
+    this.app.use(express.urlencoded({ extended: true }))
+  }
+
+  /** Verify that callback came from Facebook */
+  #verifyRequestSignature(req: IncomingMessage, res: ServerResponse, buf: Buffer) {
+    console.log('verify', this.constructor.name)
+    const signature = req.headers['x-hub-signature'] as string
+    if (!signature) {
+      throw new Error("Couldn't validate the request signature")
+    } else {
+      const elements = signature.split('=')
+      const signatureHash = elements[1]
+      const expectedHash = crypto
+        .createHmac('sha1', this.#appSecret)
+        .update(buf)
+        .digest('hex')
+
+      if (signatureHash !== expectedHash) {
+        throw new Error("Couldn't validate the request signature. Confirm your App Secret")
+      }
+    }
   }
 
   /** Start express server, default port is 3000 */
