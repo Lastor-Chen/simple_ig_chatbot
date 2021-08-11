@@ -1,6 +1,6 @@
-import type { IGSender } from "@/lib"
+import { sender } from '@/examples/modules/senderAPI'
 
-export async function basicSend(event: MsgerPostbackEvent, sender: IGSender) {
+export async function basicSend(event: MsgerPostbackEvent) {
   const sid = event.sender.id
   const [_, val] = event.postback.payload.split(':')
 
@@ -77,11 +77,7 @@ export async function basicSend(event: MsgerPostbackEvent, sender: IGSender) {
   } else if (val === 'text_link') {
     sender.sendText(sid, 'https://www.google.com')
   } else if (val === 'image') {
-    sender.sendAttachment(
-      sid,
-      'image',
-      'https://i.gyazo.com/5f23b5bfdf8f11078275bc0a954471c2.png'
-    )
+    sender.sendAttachment(sid, 'image', 'https://i.gyazo.com/5f23b5bfdf8f11078275bc0a954471c2.png')
   } else if (val === 'like_heart') {
     sender.sendAttachment(sid, 'like_heart')
   } else if (val === 'quick_replies') {

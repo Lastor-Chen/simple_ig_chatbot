@@ -1,11 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.basicSend = void 0;
-async function basicSend(event, sender) {
+const senderAPI_1 = require("@/examples/modules/senderAPI");
+async function basicSend(event) {
     const sid = event.sender.id;
     const [_, val] = event.postback.payload.split(':');
     if (!val) {
-        sender.sendTemplate(sid, [
+        senderAPI_1.sender.sendTemplate(sid, [
             {
                 title: 'Message',
                 subtitle: '純文字訊息, 亦可直接 po 超連結',
@@ -73,28 +74,28 @@ async function basicSend(event, sender) {
     }
     else if (val === 'text') {
         const senderMsg = event.postback.title;
-        const user = await sender.getUserProfile(event.sender.id);
-        sender.sendText(sid, `文字訊息, 可代入 user 名稱:\n${user?.name} chose: ${senderMsg}`);
+        const user = await senderAPI_1.sender.getUserProfile(event.sender.id);
+        senderAPI_1.sender.sendText(sid, `文字訊息, 可代入 user 名稱:\n${user?.name} chose: ${senderMsg}`);
     }
     else if (val === 'text_link') {
-        sender.sendText(sid, 'https://www.google.com');
+        senderAPI_1.sender.sendText(sid, 'https://www.google.com');
     }
     else if (val === 'image') {
-        sender.sendAttachment(sid, 'image', 'https://i.gyazo.com/5f23b5bfdf8f11078275bc0a954471c2.png');
+        senderAPI_1.sender.sendAttachment(sid, 'image', 'https://i.gyazo.com/5f23b5bfdf8f11078275bc0a954471c2.png');
     }
     else if (val === 'like_heart') {
-        sender.sendAttachment(sid, 'like_heart');
+        senderAPI_1.sender.sendAttachment(sid, 'like_heart');
     }
     else if (val === 'quick_replies') {
-        sender.sendText(sid, '快速回覆 Quick Replies', [
+        senderAPI_1.sender.sendText(sid, '快速回覆 Quick Replies', [
             '按鈕A',
             { title: '按鈕B', payload: 'null' },
             { title: '按鈕C', payload: 'null' },
         ]);
     }
     else if (val === 'template') {
-        await sender.sendText(sid, 'Template 訊息\n可包圖片、文字、按鈕，單筆最多 10 組');
-        sender.sendTemplate(sid, [
+        await senderAPI_1.sender.sendText(sid, 'Template 訊息\n可包圖片、文字、按鈕，單筆最多 10 組');
+        senderAPI_1.sender.sendTemplate(sid, [
             {
                 title: 'Generic Template',
                 subtitle: '此類模板即為 Template 訊息, 可包圖片、文字、按鈕，單筆最多 10 組元件, 每個元件最多 3 個按鈕',
