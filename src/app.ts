@@ -34,34 +34,28 @@ receiver.app.use((req, res, next) => {
   next()
 })
 
-receiver.on('text', async (event) => {
-  console.log('\n接收 text')
-
-  const sid = event.sender.id
-  const hasConvo = users.some(user => user.id === sid)
+receiver.on('text', async (event, userId) => {
+  const hasConvo = users.some((user) => user.id === userId)
   if (hasConvo) {
     convoA(event, sender)
   } else {
-    sender.sendTemplate(sid, opening)
+    sender.sendTemplate(userId, opening)
   }
 })
 
-receiver.on('postback', (event) => {
-  console.log('\n接收 postback')
-  const sid = event.sender.id
-
-  const [type, _] = event.postback.payload.split(':')
+receiver.on('postback', (event, userId) => {
+  const [type] = event.postback.payload.split(':')
   if (type === 'basic_send') {
     basicSend(event, sender)
   } else if (type === 'convo') {
     convoA(event, sender)
   } else if (type === 'convo_b') {
     // convo B
-    receiver.state.set(sid, { step: 'step_a' })
+    receiver.state.set(userId, { step: 'step_a' })
 
     // question
     console.log('start conversation B')
-    sender.sendTemplate(sid, [
+    sender.sendTemplate(userId, [
       {
         title: '請選擇種族',
         buttons: [
@@ -84,7 +78,7 @@ receiver.on('postback', (event) => {
       },
     ])
   } else {
-    sender.sendText(sid, '無效按鈕')
+    sender.sendText(userId, '無效按鈕')
   }
 })
 

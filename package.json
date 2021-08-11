@@ -4,10 +4,10 @@
   "description": "",
   "main": "build/app.ts",
   "scripts": {
-    "start": "node -r ./tsconfig-paths-prod.js ./build/app.js",
+    "start": "node -r ./tsconfig-paths-prod.js ./build/examples/index.js",
     "build": "rm -rf ./build && npx tsc && cp -R ./src/lib/types ./build/lib/types",
     "heroku-postbuild": "echo Skip build on Heroku",
-    "dev": "npx tsnd --watch ./src -r tsconfig-paths/register --respawn --transpile-only ./src/app.ts",
+    "dev": "npx tsnd --watch ./src -r tsconfig-paths/register --respawn --transpile-only ./src/examples/index.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
