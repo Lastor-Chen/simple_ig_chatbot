@@ -14,26 +14,27 @@ export function convoB(receiver: IGReceiver) {
   receiver.on<UserState>('step_a', (event, userState, userId) => {
     const nextStep = 'step_b'
 
-    // 限定回答類型為 postback
+    // Webhook event is expected to be "postback" or other
+    // Use payload as a flag to check whether it is expected answer
     if ('postback' in event && event.postback.payload === 'step_a') {
       // Send next question
       sender.sendTemplate(userId, [
         {
-          title: '請選擇職業',
+          title: 'Choose a job',
           buttons: [
             {
               type: 'postback',
-              title: '戰士',
+              title: 'Warrior',
               payload: nextStep,
             },
             {
               type: 'postback',
-              title: '法師',
+              title: 'Sorcerer',
               payload: nextStep,
             },
             {
               type: 'postback',
-              title: '牧師',
+              title: 'Healer',
               payload: nextStep,
             },
           ],
@@ -55,16 +56,16 @@ export function convoB(receiver: IGReceiver) {
       // Send next question
       sender.sendTemplate(userId, [
         {
-          title: '請選擇性別',
+          title: 'Choose a gender',
           buttons: [
             {
               type: 'postback',
-              title: '男',
+              title: 'male',
               payload: nextStep,
             },
             {
               type: 'postback',
-              title: '女',
+              title: 'female',
               payload: nextStep,
             },
           ],
@@ -81,19 +82,20 @@ export function convoB(receiver: IGReceiver) {
 
   receiver.on<UserState>('step_fin', async (event, userState, userId) => {
     if ('postback' in event && event.postback.payload === 'step_fin') {
-      const gender = event.postback.title
+      // Recode data
+      userState.gender = event.postback.title
 
       const msgs = [
-        '您選擇了:', //
-        `種族: ${userState.race}`,
-        `職業: ${userState.job}`,
-        `性別: ${gender}`,
+        'You chose,', //
+        `  race: ${userState.race}`,
+        `  job: ${userState.job}`,
+        `  gender: ${userState.gender}`,
       ]
 
       await sender.sendText(userId, msgs.join('\n'))
-      sender.sendText(userId, '連續對話結束')
+      sender.sendText(userId, 'This conversation is over')
 
-      // 對話結束, delete userState
+      // Delete userState to end this conversation
       receiver.endConversation(userId)
     } else {
       sender.sendText(userId, errMsg)

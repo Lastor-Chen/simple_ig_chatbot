@@ -9,12 +9,19 @@ interface IGReceiverOptions {
   webhook?: string
 }
 
+interface UserState {
+  /** required in conversation */
+  step: string
+  [x:string]: any
+}
+
 interface IGReceiver {
+  on(event: 'beforeEvent', cb: (event: any, userId: string) => void): this
   on(event: 'text', cb: (event: MsgerTextEvent, userId: string) => void): this
   on(event: 'quickReply', cb: (event: MsgerQuickReplyEvent, userId: string) => void): this
   on(event: 'attachments', cb: (event: MsgerAttachmentsEvent, userId: string) => void): this
   on(event: 'postback', cb: (event: MsgerPostbackEvent, userId: string) => void): this
-  on<T>(step: string, cb: (event: MsgerEventType, userState: T, userId: string) => void): this
+  on<T extends UserState>(step: string, cb: (event: MsgerEventType, userState: T, userId: string) => void): this
 }
 
 class IGReceiver extends Events {
@@ -23,7 +30,7 @@ class IGReceiver extends Events {
   #webhook: string
 
   app = express()
-  state = new Map<string, { step: string }>()
+  state = new Map<string, UserState>()
 
   constructor(options: IGReceiverOptions) {
     super()
@@ -93,6 +100,8 @@ class IGReceiver extends Events {
         if ((<MsgerTextEvent>event).message?.is_echo) return void 0
         const sid = event.sender.id
 
+        this.emit('beforeEvent', event, sid)
+
         if (this.state.has(sid)) {
           // Intercept the event to continue a conversation
           const userState = this.state.get(sid)!
@@ -121,11 +130,11 @@ class IGReceiver extends Events {
   /** End the conversation by delete user's state */
   endConversation(userId: string) {
     if (this.state.has(userId)) {
+      return this.state.delete(userId)
+    } else {
       console.log("Can't found user in conversation")
       return false
     }
-
-    return this.state.delete(userId)
   }
 }
 

@@ -33,6 +33,10 @@ receiver.app.use((req, res, next) => {
   next()
 })
 
+receiver.on('beforeEvent', (event) => {
+  console.log('Webhook Event', event)
+})
+
 receiver.on('text', async (event, userId) => {
   const hasConvo = users.some((user) => user.id === userId)
   if (hasConvo) {
@@ -76,21 +80,21 @@ receiver.on('postback', (event, userId) => {
     // Send the first question to user
     sender.sendTemplate(userId, [
       {
-        title: '請選擇種族',
+        title: 'Choose a race',
         buttons: [
           {
             type: 'postback',
-            title: '人類',
+            title: 'Human',
             payload: 'step_a',
           },
           {
             type: 'postback',
-            title: '精靈',
+            title: 'Elf',
             payload: 'step_a',
           },
           {
             type: 'postback',
-            title: '半獸人',
+            title: 'Orc',
             payload: 'step_a',
           },
         ],
