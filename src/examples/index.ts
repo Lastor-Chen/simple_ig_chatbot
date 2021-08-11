@@ -74,10 +74,13 @@ receiver.on('postback', (event, userId) => {
     // Start a manual conversation
     convoA(event)
   } else if (type === 'routeful_conversation') {
-    // Start a routeful conversation by set a event name
-    receiver.startConversation(userId, 'step_a')
+    // Start a routeful conversation by set user's conversation step name
+    // The step name will be used as event name
+    const nextStep = 'step_a'
+    receiver.gotoStep(userId, nextStep)
 
-    // Send the first question to user
+    // Send the first question to user.
+    // Use payload as flag. Help us to verify the conversation step
     sender.sendTemplate(userId, [
       {
         title: 'Choose a race',
@@ -85,17 +88,17 @@ receiver.on('postback', (event, userId) => {
           {
             type: 'postback',
             title: 'Human',
-            payload: 'step_a',
+            payload: nextStep,
           },
           {
             type: 'postback',
             title: 'Elf',
-            payload: 'step_a',
+            payload: nextStep,
           },
           {
             type: 'postback',
             title: 'Orc',
-            payload: 'step_a',
+            payload: nextStep,
           },
         ],
       },

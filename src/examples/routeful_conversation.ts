@@ -15,8 +15,12 @@ export function convoB(receiver: IGReceiver) {
     const nextStep = 'step_b'
 
     // Webhook event is expected to be "postback" or other
-    // Use payload as a flag to check whether it is expected answer
+    // Verify the payload whether match conversation step name
     if ('postback' in event && event.postback.payload === 'step_a') {
+      // Record data
+      userState.race = event.postback.title
+      receiver.gotoStep(userId, nextStep)
+
       // Send next question
       sender.sendTemplate(userId, [
         {
@@ -40,10 +44,6 @@ export function convoB(receiver: IGReceiver) {
           ],
         },
       ])
-
-      // Record data
-      userState.race = event.postback.title
-      userState.step = nextStep
     } else {
       sender.sendText(userId, errMsg)
     }
@@ -53,6 +53,10 @@ export function convoB(receiver: IGReceiver) {
     const nextStep = 'step_fin'
 
     if ('postback' in event && event.postback.payload === 'step_b') {
+      // Recode data
+      userState.job = event.postback.title
+      receiver.gotoStep(userId, nextStep)
+
       // Send next question
       sender.sendTemplate(userId, [
         {
@@ -71,10 +75,6 @@ export function convoB(receiver: IGReceiver) {
           ],
         },
       ])
-
-      // Recode data
-      userState.job = event.postback.title
-      userState.step = nextStep
     } else {
       sender.sendText(userId, errMsg)
     }
@@ -93,10 +93,12 @@ export function convoB(receiver: IGReceiver) {
       ]
 
       await sender.sendText(userId, msgs.join('\n'))
-      sender.sendText(userId, 'This conversation is over')
+      const isSuccess = await sender.sendText(userId, 'This conversation is over')
 
       // Delete userState to end this conversation
-      receiver.endConversation(userId)
+      if (isSuccess) {
+        receiver.endConversation(userId)
+      }
     } else {
       sender.sendText(userId, errMsg)
     }

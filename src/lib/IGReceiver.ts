@@ -59,7 +59,6 @@ class IGReceiver extends Events {
 
   /** Verify that callback came from Facebook */
   #verifyRequestSignature(req: IncomingMessage, res: ServerResponse, buf: Buffer) {
-    console.log('verify', this.constructor.name)
     const signature = req.headers['x-hub-signature'] as string
     if (!signature) {
       throw new Error("Couldn't validate the request signature")
@@ -152,7 +151,8 @@ class IGReceiver extends Events {
     })
   }
 
-  startConversation(userId: string, eventName: string) {
+  /** Set which conversation step is user at */
+  gotoStep(userId: string, eventName: string) {
     this.state.set(userId, { step: eventName })
   }
 

@@ -19,11 +19,12 @@ class IGSender {
     })
   }
 
-  #handleError(err: any) {
+  #handleError(err: any): false {
     console.log(err.message)
     if (axios.isAxiosError(err)) {
       console.log(err.response?.data)
     }
+    return false
   }
 
   /**
@@ -38,7 +39,7 @@ class IGSender {
     quickReplies?: Array<string | QuickReply>
   ) {
     try {
-      const data: TextMsg = {
+      const body: TextMsg = {
         messaging_type: 'RESPONSE',
         recipient: { id: receiver },
         message: { text: text },
@@ -46,12 +47,13 @@ class IGSender {
 
       if (quickReplies?.length) {
         const newQuickReplies = this.#formatQuickReplies(quickReplies)
-        data.message.quick_replies = newQuickReplies
+        body.message.quick_replies = newQuickReplies
       }
 
-      await this.graphAPI.post('/me/messages', data)
+      const { status } = await this.graphAPI.post('/me/messages', body)
+      return status === 200
     } catch (e) {
-      this.#handleError(e)
+      return this.#handleError(e)
     }
   }
 
@@ -98,9 +100,10 @@ class IGSender {
         message: { attachment },
       }
 
-      await this.graphAPI.post('/me/messages', data)
+      const { status } = await this.graphAPI.post('/me/messages', data)
+      return status === 200
     } catch (e) {
-      this.#handleError(e)
+      return this.#handleError(e)
     }
   }
 
@@ -125,9 +128,10 @@ class IGSender {
         },
       }
 
-      await this.graphAPI.post('/me/messages', data)
+      const { status } = await this.graphAPI.post('/me/messages', data)
+      return status === 200
     } catch (e) {
-      this.#handleError(e)
+      return this.#handleError(e)
     }
   }
 
@@ -146,9 +150,11 @@ class IGSender {
         params: { platform: 'instagram' },
       })
       if (data.result !== 'success') throw new Error('Set ice breakers failed')
+
       console.log('Set ice breakers is successful')
+      return true
     } catch (e) {
-      this.#handleError(e)
+      return this.#handleError(e)
     }
   }
 
@@ -169,7 +175,7 @@ class IGSender {
       )
       return data
     } catch (e) {
-      this.#handleError(e)
+      return this.#handleError(e)
     }
   }
 
@@ -194,7 +200,7 @@ class IGSender {
 
       return data
     } catch (e) {
-      this.#handleError(e)
+      return this.#handleError(e)
     }
   }
 }
