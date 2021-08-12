@@ -1,4 +1,4 @@
-import { sender } from '@/examples/modules/senderAPI'
+import { sender } from '@/examples/apis/senderAPI'
 
 export async function basicSend(event: MsgerPostbackEvent) {
   const sid = event.sender.id

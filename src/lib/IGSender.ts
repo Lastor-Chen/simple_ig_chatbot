@@ -175,7 +175,7 @@ class IGSender {
       )
       return data
     } catch (e) {
-      return this.#handleError(e)
+      this.#handleError(e)
     }
   }
 
@@ -200,7 +200,7 @@ class IGSender {
 
       return data
     } catch (e) {
-      return this.#handleError(e)
+      this.#handleError(e)
     }
   }
 }

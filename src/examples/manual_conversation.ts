@@ -1,4 +1,4 @@
-import { sender } from '@/examples/modules/senderAPI'
+import { sender } from '@/examples/apis/senderAPI'
 import { opening } from '@/examples/assets/message'
 
 interface UserState {

@@ -2,17 +2,11 @@ if (process.env.NODE_ENV !== 'production') {
   require('dotenv').config()
 }
 
-import { IGReceiver } from '@/lib'
-import { sender } from '@/examples/modules/senderAPI'
+import { receiver } from '@/examples/apis/receiverAPI'
+import { sender } from '@/examples/apis/senderAPI'
 import { basicSend } from '@/examples/basic_send'
 import { convoA, users } from '@/examples/manual_conversation'
-import { convoB } from '@/examples/routeful_conversation'
 import { opening } from '@/examples/assets/message'
-
-const receiver = new IGReceiver({
-  verifyToken: process.env.VERIFY_TOKEN!,
-  appSecret: process.env.APP_SECRET!,
-})
 
 // Set Instagram Ice Breakers
 sender.setIceBreakers([
@@ -108,8 +102,8 @@ receiver.on('postback', (event, userId) => {
   }
 })
 
-// Split file to routeful-conversation
-convoB(receiver)
+// Load split listener file
+require('@/examples/routeful_conversation')
 
 // Start express server
 receiver.start(process.env.PORT || 3000)

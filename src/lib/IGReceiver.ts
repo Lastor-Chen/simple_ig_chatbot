@@ -17,13 +17,23 @@ interface UserState {
   [x:string]: any
 }
 
+// Declaring events in a Typescript class - Stackoverflow
+// https://stackoverflow.com/questions/39142858/declaring-events-in-a-typescript-class-which-extends-eventemitter
+interface IGReceiverEvent {
+  beforeEvent: (event: any, userId: string) => void
+  text: (event: MsgerTextEvent, userId: string) => void
+  quickReply: (event: MsgerQuickReplyEvent, userId: string) => void
+  attachments: (event: MsgerAttachmentsEvent, userId: string) => void
+  postback: (event: MsgerPostbackEvent, userId: string) => void
+}
+
+type StepCallback<T = UserState> = (event: MsgerEventType, userId: string, userState: T) => void
+
 interface IGReceiver {
-  on(event: 'beforeEvent', cb: (event: any, userId: string) => void): this
-  on(event: 'text', cb: (event: MsgerTextEvent, userId: string) => void): this
-  on(event: 'quickReply', cb: (event: MsgerQuickReplyEvent, userId: string) => void): this
-  on(event: 'attachments', cb: (event: MsgerAttachmentsEvent, userId: string) => void): this
-  on(event: 'postback', cb: (event: MsgerPostbackEvent, userId: string) => void): this
-  on<T extends UserState>(step: string, cb: (event: MsgerEventType, userState: T, userId: string) => void): this
+  on<U extends keyof IGReceiverEvent>(event: U, cb: IGReceiverEvent[U]): this
+  emit<U extends keyof IGReceiverEvent>(eventName: U, ...args: Parameters<IGReceiverEvent[U]>): boolean
+  on<T extends UserState>(step: string, cb: StepCallback<T>): this
+  emit(eventName: string, ...args: Parameters<StepCallback>): boolean
 }
 
 class IGReceiver extends Events {
@@ -133,7 +143,7 @@ class IGReceiver extends Events {
         if (this.state.has(sid)) {
           // Intercept the event to continue a conversation
           const userState = this.state.get(sid)!
-          this.emit(userState.step, event, userState, sid)
+          this.emit(userState.step, event, sid, userState)
         } else if ('message' in event) {
           if ('quick_reply' in event.message) {
             this.emit('quickReply', <MsgerQuickReplyEvent>event, sid)
