@@ -45,7 +45,13 @@ class IGReceiver extends events_1.default {
     }
     /** Set which conversation step is user at */
     gotoStep(userId, eventName) {
-        this.state.set(userId, { step: eventName });
+        const user = this.state.get(userId);
+        if (user) {
+            user.step = eventName;
+        }
+        else {
+            this.state.set(userId, { step: eventName });
+        }
     }
     /** End the conversation by delete user's state */
     endConversation(userId) {

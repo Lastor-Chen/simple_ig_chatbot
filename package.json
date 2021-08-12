@@ -1,8 +1,8 @@
 {
-  "name": "ig_bot_test",
+  "name": "simple_ig_bot",
   "version": "1.0.0",
-  "description": "",
-  "main": "build/app.ts",
+  "description": "Facebook Instagram Messaging API framework",
+  "main": "build/index.js",
   "scripts": {
     "start": "node -r ./tsconfig-paths-prod.js ./build/examples/index.js",
     "build": "rm -rf ./build && npx tsc && cp -R ./src/lib/types ./build/lib/types",
@@ -10,9 +10,20 @@
     "dev": "npx tsnd --watch ./src -r tsconfig-paths/register --respawn --transpile-only ./src/examples/index.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "typings": "./build/index.d.ts",
+  "keywords": [
+    "bot",
+    "chatbot",
+    "instagram",
+    "facebook"
+  ],
+  "author": "Lastor Chen",
+  "homepage": "https://github.com/Lastor-Chen/simple_ig_chatbot",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Lastor-Chen/simple_ig_chatbot.git"
+  },
   "dependencies": {
     "axios": "^0.21.1",
     "bootbot": "^1.1.0",
