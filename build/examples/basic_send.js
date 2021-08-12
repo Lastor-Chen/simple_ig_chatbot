@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.basicSend = void 0;
-const senderAPI_1 = require("@/examples/modules/senderAPI");
+const senderAPI_1 = require("@/examples/apis/senderAPI");
 async function basicSend(event) {
     const sid = event.sender.id;
     const [_, val] = event.postback.payload.split(':');
@@ -9,7 +9,7 @@ async function basicSend(event) {
         senderAPI_1.sender.sendTemplate(sid, [
             {
                 title: 'Message',
-                subtitle: '純文字訊息, 亦可直接 po 超連結',
+                subtitle: 'To send a basic text message or http link',
                 image_url: 'https://via.placeholder.com/150x100',
                 buttons: [
                     {
@@ -26,7 +26,7 @@ async function basicSend(event) {
             },
             {
                 title: 'Attachment',
-                subtitle: '媒體附件類訊息, 圖片 or 愛心符號',
+                subtitle: 'The Instagram Messaging allows you to attach assets to messages, including images and like-heart',
                 image_url: 'https://via.placeholder.com/150x100',
                 buttons: [
                     {
@@ -43,7 +43,7 @@ async function basicSend(event) {
             },
             {
                 title: 'Quick Replies',
-                subtitle: '於文字訊息下方出現可快速選擇的按鈕',
+                subtitle: 'Quick replies provide a way to present a set of buttons in-conversation for users to reply with',
                 image_url: 'https://via.placeholder.com/150x100',
                 buttons: [
                     {
@@ -55,7 +55,7 @@ async function basicSend(event) {
             },
             {
                 title: 'Generic Template',
-                subtitle: '此類模板即為 Template 訊息, 可包圖片、文字、按鈕，單筆最多 10 組元件, 每個元件最多 3 個按鈕',
+                subtitle: 'The generic template allows you to send a structured message that includes an image, text and buttons',
                 image_url: 'https://via.placeholder.com/150x100',
                 buttons: [
                     {
@@ -65,7 +65,7 @@ async function basicSend(event) {
                     },
                     {
                         type: 'postback',
-                        title: 'button',
+                        title: 'Buttons',
                         payload: 'basic_send:template',
                     },
                 ],
@@ -75,7 +75,7 @@ async function basicSend(event) {
     else if (val === 'text') {
         const senderMsg = event.postback.title;
         const user = await senderAPI_1.sender.getUserProfile(event.sender.id);
-        senderAPI_1.sender.sendText(sid, `文字訊息, 可代入 user 名稱:\n${user?.name} chose: ${senderMsg}`);
+        senderAPI_1.sender.sendText(sid, `Morning ${user?.name}! Nice day for fishing ain't it!`);
     }
     else if (val === 'text_link') {
         senderAPI_1.sender.sendText(sid, 'https://www.google.com');
@@ -87,18 +87,17 @@ async function basicSend(event) {
         senderAPI_1.sender.sendAttachment(sid, 'like_heart');
     }
     else if (val === 'quick_replies') {
-        senderAPI_1.sender.sendText(sid, '快速回覆 Quick Replies', [
-            '按鈕A',
-            { title: '按鈕B', payload: 'null' },
-            { title: '按鈕C', payload: 'null' },
+        senderAPI_1.sender.sendText(sid, 'Quick Replies', [
+            'Button A',
+            { title: 'Button B', payload: 'null' },
+            { title: 'Button C', payload: 'null' },
         ]);
     }
     else if (val === 'template') {
-        await senderAPI_1.sender.sendText(sid, 'Template 訊息\n可包圖片、文字、按鈕，單筆最多 10 組');
         senderAPI_1.sender.sendTemplate(sid, [
             {
                 title: 'Generic Template',
-                subtitle: '此類模板即為 Template 訊息, 可包圖片、文字、按鈕，單筆最多 10 組元件, 每個元件最多 3 個按鈕',
+                subtitle: 'The generic template allows you to send a structured message that includes an image, text and buttons',
                 image_url: 'https://via.placeholder.com/150x100',
                 buttons: [
                     {
@@ -108,7 +107,7 @@ async function basicSend(event) {
                     },
                     {
                         type: 'postback',
-                        title: 'button',
+                        title: 'Buttons',
                         payload: 'null',
                     },
                 ],

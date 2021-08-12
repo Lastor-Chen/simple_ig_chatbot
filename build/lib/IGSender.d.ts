@@ -11,23 +11,23 @@ declare class IGSender {
      * @see {@link https://developers.facebook.com/docs/messenger-platform/instagram/features/send-message Instagram Messaging}
      * @see {@link https://developers.facebook.com/docs/messenger-platform/reference/buttons/quick-replies Quick Replies}
      */
-    sendText(receiver: string, text: string, quickReplies?: Array<string | QuickReply>): Promise<void>;
+    sendText(receiver: string, text: string, quickReplies?: Array<string | QuickReply>): Promise<boolean>;
     /**
      * Send attachment. Attachment type is different from Messenger
      * @see {@link https://developers.facebook.com/docs/messenger-platform/instagram/features/send-message Instagram Messaging}
      */
-    sendAttachment(receiver: string, type: AttachmentType, url?: string): Promise<void>;
+    sendAttachment(receiver: string, type: AttachmentType, url?: string): Promise<boolean>;
     /**
      * Send Template that supports a maximum of 10 elements per message and 3 buttons per element
      * @see {@link https://developers.facebook.com/docs/messenger-platform/instagram/features/generic-template Generic Template}
      * @see {@link https://developers.facebook.com/docs/messenger-platform/send-messages/buttons Buttons}
      */
-    sendTemplate(senderId: string, elements: TemplateElement[]): Promise<void>;
+    sendTemplate(senderId: string, elements: TemplateElement[]): Promise<boolean>;
     /**
      * A maximum of 4 questions can be set
      * @see {@link https://developers.facebook.com/docs/messenger-platform/instagram/features/ice-breakers#setting-ice-breakers Ice Breakers}
      */
-    setIceBreakers(iceBreakers: IceBreaker[]): Promise<void>;
+    setIceBreakers(iceBreakers: IceBreaker[]): Promise<boolean>;
     /**
      * Get current Ice Breakers
      * @see {@link https://developers.facebook.com/docs/messenger-platform/instagram/features/ice-breakers#getting-ice-breakers Ice Breakers}

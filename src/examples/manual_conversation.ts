@@ -18,8 +18,8 @@ async function convoA(event: MsgerPostbackEvent | MsgerTextEvent | MsgerAttachme
   if (!('postback' in event)) return sender.sendText(sid, errMsg)
 
   // Check custom conversation payload flag
-  const [_, step] = event.postback.payload.split(':')
-  if (!step) {
+  const [type, step] = event.postback.payload.split(':')
+  if (type === 'manual_conversation' && !step) {
     // Create a new conversation
     users.push({ id: sid, step: 'step_a' })
     return sender.sendTemplate(sid, [
@@ -51,7 +51,7 @@ async function convoA(event: MsgerPostbackEvent | MsgerTextEvent | MsgerAttachme
   if (!user) return sender.sendTemplate(sid, opening)
 
   // Conversation flow
-  if (step !== user.step) {
+  if (step !== user.step || type !== 'convo') {
     return sender.sendText(sid, errMsg)
   } else if (step === 'step_a') {
     // Update user state

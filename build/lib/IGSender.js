@@ -34,19 +34,20 @@ class IGSender {
      */
     async sendText(receiver, text, quickReplies) {
         try {
-            const data = {
+            const body = {
                 messaging_type: 'RESPONSE',
                 recipient: { id: receiver },
                 message: { text: text },
             };
             if (quickReplies?.length) {
                 const newQuickReplies = __classPrivateFieldGet(this, _IGSender_instances, "m", _IGSender_formatQuickReplies).call(this, quickReplies);
-                data.message.quick_replies = newQuickReplies;
+                body.message.quick_replies = newQuickReplies;
             }
-            await this.graphAPI.post('/me/messages', data);
+            const { status } = await this.graphAPI.post('/me/messages', body);
+            return status === 200;
         }
         catch (e) {
-            __classPrivateFieldGet(this, _IGSender_instances, "m", _IGSender_handleError).call(this, e);
+            return __classPrivateFieldGet(this, _IGSender_instances, "m", _IGSender_handleError).call(this, e);
         }
     }
     /**
@@ -70,10 +71,11 @@ class IGSender {
                 recipient: { id: receiver },
                 message: { attachment },
             };
-            await this.graphAPI.post('/me/messages', data);
+            const { status } = await this.graphAPI.post('/me/messages', data);
+            return status === 200;
         }
         catch (e) {
-            __classPrivateFieldGet(this, _IGSender_instances, "m", _IGSender_handleError).call(this, e);
+            return __classPrivateFieldGet(this, _IGSender_instances, "m", _IGSender_handleError).call(this, e);
         }
     }
     /**
@@ -96,10 +98,11 @@ class IGSender {
                     },
                 },
             };
-            await this.graphAPI.post('/me/messages', data);
+            const { status } = await this.graphAPI.post('/me/messages', data);
+            return status === 200;
         }
         catch (e) {
-            __classPrivateFieldGet(this, _IGSender_instances, "m", _IGSender_handleError).call(this, e);
+            return __classPrivateFieldGet(this, _IGSender_instances, "m", _IGSender_handleError).call(this, e);
         }
     }
     /**
@@ -118,9 +121,10 @@ class IGSender {
             if (data.result !== 'success')
                 throw new Error('Set ice breakers failed');
             console.log('Set ice breakers is successful');
+            return true;
         }
         catch (e) {
-            __classPrivateFieldGet(this, _IGSender_instances, "m", _IGSender_handleError).call(this, e);
+            return __classPrivateFieldGet(this, _IGSender_instances, "m", _IGSender_handleError).call(this, e);
         }
     }
     /**
@@ -171,6 +175,7 @@ _IGSender_accessToken = new WeakMap(), _IGSender_instances = new WeakSet(), _IGS
     if (axios_1.default.isAxiosError(err)) {
         console.log(err.response?.data);
     }
+    return false;
 }, _IGSender_formatQuickReplies = function _IGSender_formatQuickReplies(quickReplies) {
     return quickReplies.map((reply) => {
         if (typeof reply === 'string') {

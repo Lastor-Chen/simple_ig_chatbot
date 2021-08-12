@@ -2,7 +2,7 @@
 
 export const opening: TemplateElement[] = [
   {
-    title: 'Please choose one to demo',
+    title: 'Please choose one to demo Instagram Messaging API',
     buttons: [
       {
         type: 'postback',

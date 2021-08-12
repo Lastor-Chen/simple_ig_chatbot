@@ -11,11 +11,7 @@ import { opening } from '@/examples/assets/message'
 // Set Instagram Ice Breakers
 sender.setIceBreakers([
   {
-    question: 'Button A',
-    payload: 'get_started',
-  },
-  {
-    question: 'Button B',
+    question: 'Get Started',
     payload: 'get_started',
   },
 ])

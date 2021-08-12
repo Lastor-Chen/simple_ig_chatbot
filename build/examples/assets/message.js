@@ -4,7 +4,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.opening = void 0;
 exports.opening = [
     {
-        title: 'Please choose one to demo',
+        title: 'Please choose one to demo Instagram Messaging API',
         buttons: [
             {
                 type: 'postback',

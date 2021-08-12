@@ -7,5 +7,5 @@ interface UserState {
     gender?: string;
 }
 declare const users: UserState[];
-declare function convoA(event: MsgerPostbackEvent | MsgerTextEvent | MsgerAttachmentsEvent): Promise<void>;
+declare function convoA(event: MsgerPostbackEvent | MsgerTextEvent | MsgerAttachmentsEvent): Promise<boolean | undefined>;
 export { convoA, users };

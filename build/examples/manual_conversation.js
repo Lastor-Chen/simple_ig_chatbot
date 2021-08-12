@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.users = exports.convoA = void 0;
-const senderAPI_1 = require("@/examples/modules/senderAPI");
+const senderAPI_1 = require("@/examples/apis/senderAPI");
 const message_1 = require("@/examples/assets/message");
 const users = [];
 exports.users = users;
@@ -12,8 +12,8 @@ async function convoA(event) {
     if (!('postback' in event))
         return senderAPI_1.sender.sendText(sid, errMsg);
     // Check custom conversation payload flag
-    const [_, step] = event.postback.payload.split(':');
-    if (!step) {
+    const [type, step] = event.postback.payload.split(':');
+    if (type === 'manual_conversation' && !step) {
         // Create a new conversation
         users.push({ id: sid, step: 'step_a' });
         return senderAPI_1.sender.sendTemplate(sid, [
@@ -44,7 +44,7 @@ async function convoA(event) {
     if (!user)
         return senderAPI_1.sender.sendTemplate(sid, message_1.opening);
     // Conversation flow
-    if (step !== user.step) {
+    if (step !== user.step || type !== 'convo') {
         return senderAPI_1.sender.sendText(sid, errMsg);
     }
     else if (step === 'step_a') {

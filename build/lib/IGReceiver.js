@@ -13,10 +13,11 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-var _IGReceiver_instances, _IGReceiver_verifyToken, _IGReceiver_appSecret, _IGReceiver_webhook, _IGReceiver_configExpress, _IGReceiver_initWebhook, _IGReceiver_postWebhook, _IGReceiver_handleMsgerData;
+var _IGReceiver_instances, _IGReceiver_verifyToken, _IGReceiver_appSecret, _IGReceiver_webhook, _IGReceiver_configExpress, _IGReceiver_verifyRequestSignature, _IGReceiver_initWebhook, _IGReceiver_postWebhook, _IGReceiver_handleMsgerData;
 Object.defineProperty(exports, "__esModule", { value: true });
 const events_1 = __importDefault(require("events"));
 const express_1 = __importDefault(require("express"));
+const crypto_1 = __importDefault(require("crypto"));
 class IGReceiver extends events_1.default {
     constructor(options) {
         super();
@@ -42,7 +43,8 @@ class IGReceiver extends events_1.default {
             console.log(`Webhook running on localhost:${port}/webhook`);
         });
     }
-    startConversation(userId, eventName) {
+    /** Set which conversation step is user at */
+    gotoStep(userId, eventName) {
         this.state.set(userId, { step: eventName });
     }
     /** End the conversation by delete user's state */
@@ -57,8 +59,28 @@ class IGReceiver extends events_1.default {
     }
 }
 _IGReceiver_verifyToken = new WeakMap(), _IGReceiver_appSecret = new WeakMap(), _IGReceiver_webhook = new WeakMap(), _IGReceiver_instances = new WeakSet(), _IGReceiver_configExpress = function _IGReceiver_configExpress() {
-    this.app.use(express_1.default.json()); // 解析 request json body
-    this.app.use(express_1.default.urlencoded({ extended: true })); // 解析 queryString
+    // Parse application/json
+    this.app.use(__classPrivateFieldGet(this, _IGReceiver_webhook, "f"), express_1.default.json({
+        verify: (req, res, buf) => __classPrivateFieldGet(this, _IGReceiver_instances, "m", _IGReceiver_verifyRequestSignature).call(this, req, res, buf),
+    }));
+    // Parse queryString application/x-www-form-urlencoded
+    this.app.use(express_1.default.urlencoded({ extended: true }));
+}, _IGReceiver_verifyRequestSignature = function _IGReceiver_verifyRequestSignature(req, res, buf) {
+    const signature = req.headers['x-hub-signature'];
+    if (!signature) {
+        throw new Error("Couldn't validate the request signature");
+    }
+    else {
+        const elements = signature.split('=');
+        const signatureHash = elements[1];
+        const expectedHash = crypto_1.default
+            .createHmac('sha1', __classPrivateFieldGet(this, _IGReceiver_appSecret, "f"))
+            .update(buf)
+            .digest('hex');
+        if (signatureHash !== expectedHash) {
+            throw new Error("Couldn't validate the request signature. Confirm your App Secret");
+        }
+    }
 }, _IGReceiver_initWebhook = function _IGReceiver_initWebhook() {
     // Verify webhook callback URL
     const webhookPath = __classPrivateFieldGet(this, _IGReceiver_webhook, "f")[0] !== '/' ? `/${__classPrivateFieldGet(this, _IGReceiver_webhook, "f")}` : __classPrivateFieldGet(this, _IGReceiver_webhook, "f");
@@ -99,7 +121,7 @@ _IGReceiver_verifyToken = new WeakMap(), _IGReceiver_appSecret = new WeakMap(), 
             if (this.state.has(sid)) {
                 // Intercept the event to continue a conversation
                 const userState = this.state.get(sid);
-                this.emit(userState.step, event, userState, sid);
+                this.emit(userState.step, event, sid, userState);
             }
             else if ('message' in event) {
                 if ('quick_reply' in event.message) {
