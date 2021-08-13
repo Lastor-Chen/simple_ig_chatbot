@@ -5,12 +5,28 @@ const senderAPI_1 = require("@/examples/apis/senderAPI");
 const message_1 = require("@/examples/assets/message");
 const users = [];
 exports.users = users;
-const errMsg = 'Please choose a button from current question';
+function endConversation(userId) {
+    // Remove user state to end the conversation
+    const targetIdx = users.findIndex((item) => item.id === userId);
+    users.splice(targetIdx, 1);
+    senderAPI_1.sender.sendText(userId, 'This conversation is over. You can input any text to restart');
+}
+async function handleUnexpected(userId, event) {
+    const payload = event.message?.quick_reply?.payload;
+    if (payload === 'restart') {
+        endConversation(userId);
+    }
+    else {
+        await senderAPI_1.sender.sendText(userId, 'Please choose a button from current question');
+        senderAPI_1.sender.sendText(userId, 'Or you can restart the conversation.', [{ title: 'restart', payload: 'restart' }]);
+    }
+}
+// Main function
 async function convoA(event) {
     // Limit conversation is a postback event
     const sid = event.sender.id;
     if (!('postback' in event))
-        return senderAPI_1.sender.sendText(sid, errMsg);
+        return handleUnexpected(sid, event);
     // Check custom conversation payload flag
     const [type, step] = event.postback.payload.split(':');
     if (type === 'manual_conversation' && !step) {
@@ -45,7 +61,7 @@ async function convoA(event) {
         return senderAPI_1.sender.sendTemplate(sid, message_1.opening);
     // Conversation flow
     if (step !== user.step || type !== 'convo') {
-        return senderAPI_1.sender.sendText(sid, errMsg);
+        return handleUnexpected(sid, event);
     }
     else if (step === 'step_a') {
         // Update user state
@@ -107,10 +123,7 @@ async function convoA(event) {
             `  gender: ${user.gender}`,
         ];
         await senderAPI_1.sender.sendText(sid, msgs.join('\n'));
-        senderAPI_1.sender.sendText(sid, 'This conversation is over');
-        // Remove user state to end the conversation
-        const targetIdx = users.findIndex((item) => item.id === user.id);
-        users.splice(targetIdx, 1);
+        endConversation(user.id);
     }
 }
 exports.convoA = convoA;

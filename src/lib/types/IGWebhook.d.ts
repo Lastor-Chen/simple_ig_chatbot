@@ -6,19 +6,19 @@ interface MsgerBody {
   entry: {
     time: number
     id: string
-    messaging: Array<MsgerEventType>
+    messaging: Array<MsgerEvent>
   }[]
 }
 
-type MsgerEventType = MsgerTextEvent | MsgerQuickReplyEvent | MsgerAttachmentsEvent | MsgerPostbackEvent
+type MsgerEvent = MsgerTextEvent | MsgerQuickReplyEvent | MsgerAttachmentsEvent | MsgerPostbackEvent
 
-interface MsgerEvent {
+interface MsgerEventBase {
   sender: { id: string }
   recipient: { id: string }
   timestamp: number
 }
 
-interface MsgerTextEvent extends MsgerEvent {
+interface MsgerTextEvent extends MsgerEventBase {
   message: {
     mid: string
     text: string
@@ -26,7 +26,7 @@ interface MsgerTextEvent extends MsgerEvent {
   }
 }
 
-interface MsgerQuickReplyEvent extends MsgerEvent {
+interface MsgerQuickReplyEvent extends MsgerEventBase {
   message: {
     mid: string
     text: string
@@ -35,7 +35,7 @@ interface MsgerQuickReplyEvent extends MsgerEvent {
   }
 }
 
-interface MsgerAttachmentsEvent extends MsgerEvent {
+interface MsgerAttachmentsEvent extends MsgerEventBase {
   message: {
     mid: string
     attachments: {
@@ -46,7 +46,7 @@ interface MsgerAttachmentsEvent extends MsgerEvent {
   }
 }
 
-interface MsgerPostbackEvent extends MsgerEvent {
+interface MsgerPostbackEvent extends MsgerEventBase {
   postback: {
     mid: string
     title: string

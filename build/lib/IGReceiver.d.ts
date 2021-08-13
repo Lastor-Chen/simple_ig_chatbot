@@ -19,7 +19,7 @@ interface IGReceiverEvent {
     attachments: (event: MsgerAttachmentsEvent, userId: string) => void;
     postback: (event: MsgerPostbackEvent, userId: string) => void;
 }
-declare type StepCallback<T = UserState> = (event: MsgerEventType, userId: string, userState: T) => void;
+declare type StepCallback<T = UserState> = (event: MsgerEvent, userId: string, userState: T) => void;
 interface IGReceiver {
     on<U extends keyof IGReceiverEvent>(event: U, cb: IGReceiverEvent[U]): this;
     emit<U extends keyof IGReceiverEvent>(eventName: U, ...args: Parameters<IGReceiverEvent[U]>): boolean;

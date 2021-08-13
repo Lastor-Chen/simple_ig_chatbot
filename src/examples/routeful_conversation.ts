@@ -8,7 +8,6 @@ interface UserState {
   gender?: string
 }
 
-const errMsg = 'Please choose a button from current question'
 
 receiver.on<UserState>('step_a', (event, userId, userState) => {
   const nextStep = 'step_b'
@@ -44,7 +43,7 @@ receiver.on<UserState>('step_a', (event, userId, userState) => {
       },
     ])
   } else {
-    sender.sendText(userId, errMsg)
+    handleUnexpected(userId, event)
   }
 })
 
@@ -75,7 +74,7 @@ receiver.on<UserState>('step_b', (event, userId, userState) => {
       },
     ])
   } else {
-    sender.sendText(userId, errMsg)
+    handleUnexpected(userId, event)
   }
 })
 
@@ -92,13 +91,25 @@ receiver.on<UserState>('step_fin', async (event, userId, userState) => {
     ]
 
     await sender.sendText(userId, msgs.join('\n'))
-    const isSuccess = await sender.sendText(userId, 'This conversation is over')
-
-    // Delete userState to end this conversation
-    if (isSuccess) {
-      receiver.endConversation(userId)
-    }
+    endConversation(userId)
   } else {
-    sender.sendText(userId, errMsg)
+    handleUnexpected(userId, event)
   }
 })
+
+function endConversation(userId: string) {
+  // Delete userState to end this conversation
+  receiver.endConversation(userId)
+  sender.sendText(userId, 'This conversation is over. You can input any text to restart')
+}
+
+async function handleUnexpected(userId: string, event: MsgerEvent) {
+  const payload = (<MsgerQuickReplyEvent>event).message?.quick_reply?.payload
+
+  if (payload === 'restart') {
+    endConversation(userId)
+  } else {
+    await sender.sendText(userId, 'Please choose a button from current question')
+    sender.sendText(userId, 'Or you can restart the conversation.', [{ title: 'restart', payload: 'restart' }])
+  }
+}

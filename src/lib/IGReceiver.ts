@@ -27,7 +27,7 @@ interface IGReceiverEvent {
   postback: (event: MsgerPostbackEvent, userId: string) => void
 }
 
-type StepCallback<T = UserState> = (event: MsgerEventType, userId: string, userState: T) => void
+type StepCallback<T = UserState> = (event: MsgerEvent, userId: string, userState: T) => void
 
 interface IGReceiver {
   on<U extends keyof IGReceiverEvent>(event: U, cb: IGReceiverEvent[U]): this

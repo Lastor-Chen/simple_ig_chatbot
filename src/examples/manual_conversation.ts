@@ -10,12 +10,32 @@ interface UserState {
 }
 
 const users: UserState[] = []
-const errMsg = 'Please choose a button from current question'
 
-async function convoA(event: MsgerPostbackEvent | MsgerTextEvent | MsgerAttachmentsEvent) {
+function endConversation(userId: string) {
+  // Remove user state to end the conversation
+  const targetIdx = users.findIndex((item) => item.id === userId)
+  users.splice(targetIdx, 1)
+
+  sender.sendText(userId, 'This conversation is over. You can input any text to restart')
+}
+
+async function handleUnexpected(userId: string, event: MsgerEvent) {
+  const payload = (<MsgerQuickReplyEvent>event).message?.quick_reply?.payload
+
+  if (payload === 'restart') {
+    endConversation(userId)
+  } else {
+    await sender.sendText(userId, 'Please choose a button from current question')
+    sender.sendText(userId, 'Or you can restart the conversation.', [{ title: 'restart', payload: 'restart' }])
+  }
+}
+
+// Main function
+async function convoA(event: MsgerEvent) {
   // Limit conversation is a postback event
   const sid = event.sender.id
-  if (!('postback' in event)) return sender.sendText(sid, errMsg)
+  if (!('postback' in event)) return handleUnexpected(sid, event)
+
 
   // Check custom conversation payload flag
   const [type, step] = event.postback.payload.split(':')
@@ -52,7 +72,7 @@ async function convoA(event: MsgerPostbackEvent | MsgerTextEvent | MsgerAttachme
 
   // Conversation flow
   if (step !== user.step || type !== 'convo') {
-    return sender.sendText(sid, errMsg)
+    return handleUnexpected(sid, event)
   } else if (step === 'step_a') {
     // Update user state
     user.step = 'step_b'
@@ -114,11 +134,7 @@ async function convoA(event: MsgerPostbackEvent | MsgerTextEvent | MsgerAttachme
       `  gender: ${user.gender}`,
     ]
     await sender.sendText(sid, msgs.join('\n'))
-    sender.sendText(sid, 'This conversation is over')
-
-    // Remove user state to end the conversation
-    const targetIdx = users.findIndex((item) => item.id === user.id)
-    users.splice(targetIdx, 1)
+    endConversation(user.id)
   }
 }
 

@@ -30,7 +30,7 @@ receiver.on('beforeEvent', (event) => {
 receiver.on('text', async (event, userId) => {
   const hasConvo = users.some((user) => user.id === userId)
   if (hasConvo) {
-    // Intercept the event to continue a conversation
+    // Intercept the event to continue manual_conversation
     convoA(event)
   } else {
     sender.sendTemplate(userId, opening)
@@ -40,7 +40,7 @@ receiver.on('text', async (event, userId) => {
 receiver.on('attachments', async (event, userId) => {
   const hasConvo = users.some((user) => user.id === userId)
   if (hasConvo) {
-    // Intercept the event to continue a conversation
+    // Intercept the event to continue manual_conversation
     convoA(event)
   } else {
     sender.sendTemplate(userId, opening)
@@ -95,6 +95,14 @@ receiver.on('postback', (event, userId) => {
     ])
   } else {
     sender.sendText(userId, 'invalid message')
+  }
+})
+
+receiver.on('quickReply', (event, userId) => {
+  const hasConvo = users.some((user) => user.id === userId)
+  if (hasConvo) {
+    // Intercept the event to continue manual_conversation
+    convoA(event)
   }
 })
 

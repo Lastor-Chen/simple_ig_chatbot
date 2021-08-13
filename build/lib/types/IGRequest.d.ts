@@ -83,16 +83,10 @@ interface TemplateElement {
     url: string
   }
   /** A maximum of 3 buttons per element is supported */
-  buttons?: ButtonType[]
+  buttons?: TemplateButton[]
 }
 
-type ButtonType =
-  | URLButton
-  | PostbackButton
-  | CallButton
-  | LoginButton
-  | LogoutButton
-  | GamePlayButton
+type TemplateButton = URLButton | PostbackButton | CallButton | LoginButton | LogoutButton | GamePlayButton
 
 interface URLButton {
   type: 'web_url'

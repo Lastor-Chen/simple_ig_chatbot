@@ -27,7 +27,7 @@ receiverAPI_1.receiver.on('beforeEvent', (event) => {
 receiverAPI_1.receiver.on('text', async (event, userId) => {
     const hasConvo = manual_conversation_1.users.some((user) => user.id === userId);
     if (hasConvo) {
-        // Intercept the event to continue a conversation
+        // Intercept the event to continue manual_conversation
         manual_conversation_1.convoA(event);
     }
     else {
@@ -37,7 +37,7 @@ receiverAPI_1.receiver.on('text', async (event, userId) => {
 receiverAPI_1.receiver.on('attachments', async (event, userId) => {
     const hasConvo = manual_conversation_1.users.some((user) => user.id === userId);
     if (hasConvo) {
-        // Intercept the event to continue a conversation
+        // Intercept the event to continue manual_conversation
         manual_conversation_1.convoA(event);
     }
     else {
@@ -94,6 +94,13 @@ receiverAPI_1.receiver.on('postback', (event, userId) => {
     }
     else {
         senderAPI_1.sender.sendText(userId, 'invalid message');
+    }
+});
+receiverAPI_1.receiver.on('quickReply', (event, userId) => {
+    const hasConvo = manual_conversation_1.users.some((user) => user.id === userId);
+    if (hasConvo) {
+        // Intercept the event to continue manual_conversation
+        manual_conversation_1.convoA(event);
     }
 });
 // Load split listener file
