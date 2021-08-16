@@ -126,21 +126,204 @@ $ ngrok http 3000
 ## IGReceiver Class
 IGReceiver is responsible for receive [Webhook](https://developers.facebook.com/docs/messenger-platform/instagram/features/webhook) from Instagram Messaging.
 
-#### new IGReceiver(options)
-#### .start([port])
-#### .gotoStep(userId, eventName)
-#### .endConversation(userId)
-#### .app
-#### .state
+### `new IGReceiver(options)`
+| Property | Type | Default |
+| -------- | -------- | -------- |
+| verifyToken | string | |
+| appSecret | string | |
+| webhook? | string | "/wbhook" |
+
+### `.start([port])`
+| Params | Type | Default |
+| -------- | -------- | -------- |
+| port? | string \| number | 3000 |
+
+### `.on(event, callback)`
+Listen Instagram Webhook
+| Params | Type | Default |
+| -------- | -------- | -------- |
+| event | string | |
+| callback | (event, userId) => this | |
+
+Webhook Event. ([See more](https://developers.facebook.com/docs/messenger-platform/instagram/features/webhook#webhook-events))
+| Event | Description | Interface |
+| -------- | -------- | --------- |
+| beforeEvent | Received a any message from user. Emit this event before check what type | MsgerEvent |
+| text | Received a text message from user | MsgerTextEvent |
+| quickReply | Received a quick reply from user | MsgerQuickReplyEvent |
+| attachments | Received a attachments from user | MsgerAttachmentsEvent |
+| postback | Received a postback from user | MsgerPostbackEvent |
+
+Callback Params
+| Params | Description | Type |
+| -------- | -------- | ----- |
+| event | The request data from Instagram | MsgerEvent |
+| userId | The sender's [IGSID](https://developers.facebook.com/docs/messenger-platform/instagram/overview#igsid) | string |
+
+### `.on<T>(step, callback)`
+Listen custom conversation `step` Event. You can use `.gotoStep()` to specify it.
+| Params | Type | Default |
+| -------- | -------- | -------- |
+| step | string | |
+| callback | (step, userId, userState\<T>) => this | |
+
+Callback Params
+| Params | Description | Type |
+| -------- | -------- | ----- |
+| step | Custom event for conversation | string |
+| userId | The sender's [IGSID](https://developers.facebook.com/docs/messenger-platform/instagram/overview#igsid) | string |
+| userState | A javascript Map object for save user's state | UserState |
+
+You can specify a custom user's state Interface. `step` prop is required.
+```ts
+// Typescript
+interface UserState {
+  step: string
+  job: string
+  // ...any more
+}
+
+receiver.on<UserState>('customStep', (event, userId, userState) => {
+  user.job  // OK
+  user.foo  // Error, prop does not exist on type UserState
+})
+```
+
+### `.gotoStep(userId, eventName)`
+Assigns custom `step` Event to user's state. It will start a conversation.
+| Params | Type | Default |
+| -------- | -------- | -------- |
+| userId | string | |
+| eventName | string | |
+
+### `.endConversation(userId)`
+Ends a conversation by delete user's state.
+| Params | Type | Default |
+| -------- | -------- | -------- |
+| userId | string | |
+
+### `.state`
+A javascript Map object for save user's state.
+```ts
+// Set conversation "step" event to user
+receiver.state.set('userId', { step: eventName })
+
+// Get user's state then add a new one
+const userState = receiver.state.get('userId')
+userState.foo = 'new state value'
+```
+
+### `.app`
+[Express Application](https://expressjs.com/zh-tw/4x/api.html#app).
 
 ## IGSender Class
-IGReceiver is responsible for pass request to Messenger Platform via [Facebook Send API](https://developers.facebook.com/docs/messenger-platform/instagram/features/send-message).
-It's based on axios.
+IGReceiver is responsible for pass request to Messenger Platform via [Facebook Send API](https://developers.facebook.com/docs/messenger-platform/instagram/features/send-message). It's based on axios.
 
-#### new IGSender(options)
-#### .sendText(receiver, text [, quickReplies])
-#### .sendAttachment(receiver, type, url)
+### `new IGSender(accessToken)`
+| Params | Type | Default |
+| -------- | -------- | -------- |
+| accessToken | string | |
+
+### `.sendText(receiver, text [, quickReplies])`
+Send text message or quick replies. QuickReply payload is English and numbers only.
+| Params | Type | Default |
+| -------- | -------- | -------- |
+| receiver | string | |
+| text | string | |
+| quickReplies? | Array<string \| QuickReply> | |
+
+See [Quick Replies](https://developers.facebook.com/docs/messenger-platform/send-messages/quick-replies).
+```ts
+Interface QuickReply {
+  content_type?: 'text'
+  title: string
+  payload: string
+  image_url?: string
+}
+
+sender.sendText('userId', 'textContent', [
+  {
+    // QuickReply Interface
+  }
+])
+```
+
+### `.sendAttachment(receiver, type, url)`
+Send attachment. Attachment type is different from Messenger.
+| Params | Type | Default |
+| -------- | -------- | -------- |
+| receiver | string | |
+| type | "image" \| "like_heart" \| "media_share" | |
+| url? | string | " " |
+
 #### .sendTemplate(receiver, elements)
+Send Template that supports a maximum of 10 elements per message and 3 buttons per element.
+| Params | Type | Default |
+| -------- | -------- | -------- |
+| receiver | string | |
+| elements | Array\<TemplateElement> | |
+
+```ts
+interface TemplateElement {
+  /** 80 character limit */
+  title: string
+  /** 80 character limit */
+  subtitle?: string
+  image_url?: string
+  /** The default action executed when the template is tapped */
+  default_action?: {
+    type: 'web_url'
+    url: string
+  }
+  /** A maximum of 3 buttons per element is supported */
+  buttons?: TemplateButton[]
+}
+```
+
+Type TemplateButton is reference from [Buttons](https://developers.facebook.com/docs/messenger-platform/send-messages/buttons)
+
 #### .setIceBreakers(iceBreakers)
+Set opening questions. A maximum of 4 questions can be set. See [Ice Breakers](https://developers.facebook.com/docs/messenger-platform/instagram/features/ice-breakers).
+| Params | Type | Default |
+| -------- | -------- | -------- |
+| iceBreakers | Array\<IceBreaker> | |
+
+```ts
+interface IceBreaker {
+  question: string
+  payload: string
+}
+```
+
 #### .getIceBreakers()
+Get current Ice Breakers. See [Ice Breakers](https://developers.facebook.com/docs/messenger-platform/instagram/features/ice-breakers).
+
+```ts
+// Response
+interface IceBreakerRes {
+  data: {
+    ice_breakers: IceBreaker[]
+  }[]
+}
+```
+
 #### .getUserProfile(userId [, fields])
+Get Instagram user's profile information. See [User Profile](https://developers.facebook.com/docs/messenger-platform/instagram/features/user-profile)
+| Params | Type | Default |
+| -------- | -------- | -------- |
+| userID | string | |
+| fields? | Array<"name" \| "profile_pci"> | ["name"] |
+
+## Examples
+See more demo from `./examples` directory. To run example files, make sure configure the `.env` file with Facebook's token.
+
+##### watch mode in typescript
+```bash
+$ npm run dev
+```
+
+##### run it in javascript
+```bash
+$ npm run build
+$ npm start
+```

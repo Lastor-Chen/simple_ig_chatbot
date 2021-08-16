@@ -20,7 +20,7 @@ interface UserState {
 // Declaring events in a Typescript class - Stackoverflow
 // https://stackoverflow.com/questions/39142858/declaring-events-in-a-typescript-class-which-extends-eventemitter
 interface IGReceiverEvent {
-  beforeEvent: (event: any, userId: string) => void
+  beforeEvent: (event: MsgerEvent, userId: string) => void
   text: (event: MsgerTextEvent, userId: string) => void
   quickReply: (event: MsgerQuickReplyEvent, userId: string) => void
   attachments: (event: MsgerAttachmentsEvent, userId: string) => void
@@ -161,7 +161,7 @@ class IGReceiver extends Events {
     })
   }
 
-  /** Set which conversation step is user at */
+  /** Assigns custom "step" Event to user's state. It will start a conversation */
   gotoStep(userId: string, eventName: string) {
     const user = this.state.get(userId)
     if (user) {
@@ -171,7 +171,7 @@ class IGReceiver extends Events {
     }
   }
 
-  /** End the conversation by delete user's state */
+  /** Ends a conversation by delete user's state */
   endConversation(userId: string) {
     if (this.state.has(userId)) {
       return this.state.delete(userId)

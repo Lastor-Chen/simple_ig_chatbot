@@ -28,7 +28,7 @@ class IGSender {
   }
 
   /**
-   * Send message with text or quick replies. QuickReply payload is English and numbers only.
+   * Send text message or quick replies. QuickReply payload is English and numbers only.
    * @see {@link https://developers.facebook.com/docs/messenger-platform/reference/send-api#message Send Message API}
    * @see {@link https://developers.facebook.com/docs/messenger-platform/instagram/features/send-message Instagram Messaging}
    * @see {@link https://developers.facebook.com/docs/messenger-platform/reference/buttons/quick-replies Quick Replies}
@@ -112,11 +112,11 @@ class IGSender {
    * @see {@link https://developers.facebook.com/docs/messenger-platform/instagram/features/generic-template Generic Template}
    * @see {@link https://developers.facebook.com/docs/messenger-platform/send-messages/buttons Buttons}
    */
-  async sendTemplate(senderId: string, elements: TemplateElement[]) {
+  async sendTemplate(receiver: string, elements: TemplateElement[]) {
     try {
       const data: TemplateMsg = {
         messaging_type: 'RESPONSE',
-        recipient: { id: senderId },
+        recipient: { id: receiver },
         message: {
           attachment: {
             type: 'template',
@@ -136,7 +136,7 @@ class IGSender {
   }
 
   /**
-   * A maximum of 4 questions can be set
+   * Set opening questions. A maximum of 4 questions can be set
    * @see {@link https://developers.facebook.com/docs/messenger-platform/instagram/features/ice-breakers#setting-ice-breakers Ice Breakers}
    */
   async setIceBreakers(iceBreakers: IceBreaker[]) {
@@ -183,7 +183,7 @@ class IGSender {
    * Get Instagram user's profile information
    * @see {@link https://developers.facebook.com/docs/messenger-platform/instagram/features/user-profile User Profile}
    */
-  async getUserProfile(IGSID: string, fields?: Array<'name' | 'profile_pci'>) {
+  async getUserProfile(userId: string, fields?: Array<'name' | 'profile_pci'>) {
     try {
       // Remove the same field
       const fieldSet = new Set(fields)
@@ -192,7 +192,7 @@ class IGSender {
         id: string
         name?: string
         profile_pic?: string
-      }>(`/${IGSID}`, {
+      }>(`/${userId}`, {
         params: {
           fields: [...fieldSet].join(',') || 'name',
         },
